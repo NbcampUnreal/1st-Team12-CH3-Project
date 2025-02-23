@@ -17,6 +17,7 @@ APlayerCharacter::APlayerCharacter()
 
 	FullBodyMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FullBodyMeshComponent"));
 	FullBodyMeshComponent->SetupAttachment(CapsuleComponent);
+	FullBodyMeshComponent->bHiddenInGame = true;
 
 	FPSMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPSMeshComponent"));
 	FPSMeshComponent->SetupAttachment(CapsuleComponent);
