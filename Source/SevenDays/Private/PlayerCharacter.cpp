@@ -18,9 +18,14 @@ APlayerCharacter::APlayerCharacter()
 	FullBodyMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FullBodyMeshComponent"));
 	FullBodyMeshComponent->SetupAttachment(CapsuleComponent);
 	FullBodyMeshComponent->bHiddenInGame = true;
+	FullBodyMeshComponent->bCastDynamicShadow = true;
+	FullBodyMeshComponent->bCastStaticShadow = true;
 
 	FPSMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPSMeshComponent"));
 	FPSMeshComponent->SetupAttachment(CapsuleComponent);
+	FPSMeshComponent->bHiddenInGame = false;
+	FPSMeshComponent->bCastDynamicShadow = true;
+	FPSMeshComponent->bCastStaticShadow = true;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(CapsuleComponent);
