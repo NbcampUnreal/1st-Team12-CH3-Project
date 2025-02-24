@@ -17,7 +17,11 @@ class SEVENDAYS_API AMyPlayerController : public APlayerController
 public:
 	AMyPlayerController();
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input|IMC")
 	UInputMappingContext* InputMappingContext;
@@ -36,8 +40,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* CrouchAction;
-
-
 
 protected:
 };

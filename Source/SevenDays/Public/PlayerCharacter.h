@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
 class UCapsuleComponent;
@@ -12,8 +12,10 @@ class UCameraComponent;
 class USpringArmComponent;
 class UCharacterMovementComponent;
 
+struct FInputActionValue;
+
 UCLASS()
-class SEVENDAYS_API APlayerCharacter : public APawn
+class SEVENDAYS_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -23,11 +25,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	float NormalSpeed = 400.0f;
+	float SprintSpeed = 700.0f;
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capsule")
-	UCapsuleComponent* CapsuleComponent;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SkeletalMesh")
 	USkeletalMeshComponent* FullBodyMeshComponent;
 
@@ -40,9 +41,26 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	UCharacterMovementComponent* MovementComponent;
-protected:
 
+protected:
+	UFUNCTION()
+	void Move(const FInputActionValue& _Value);
+	UFUNCTION()
+	void Look(const FInputActionValue& _Value);
+	UFUNCTION()
+
+	void StartJump(const FInputActionValue& _Value);
+	UFUNCTION()
+	void StopJump(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void StartSprint(const FInputActionValue& _Value);
+	UFUNCTION()
+	void StopSprint(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void StartCrouch(const FInputActionValue& _Value);
+	UFUNCTION()
+	void StopCrouch(const FInputActionValue& _Value);
 
 };
