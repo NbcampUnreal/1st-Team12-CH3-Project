@@ -21,6 +21,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* HeadCollision;
 
+	//공격 범위
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UBoxComponent* HitCollision;
+
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -32,13 +37,20 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-
+	UFUNCTION(BlueprintCallable)
+	virtual void ZombieAttack();
+	UFUNCTION(BlueprintCallable)
+	virtual void ZombieAttackEnd();
 
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FNBC_ZombieStruct ZombieStat;
 
-	
+	UFUNCTION()
+	virtual void CollisionOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse, const FHitResult& Hit);
+
+	FTimerHandle HitDelayTimer;
 
 };
