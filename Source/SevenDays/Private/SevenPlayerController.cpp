@@ -2,13 +2,25 @@
 #include "SevenPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "SevenUserWidget.h"
+#include "EnhancedInputSubsystems.h"
+
 
 
 
 ASevenPlayerController::ASevenPlayerController()
 {
-    // 마우스 커서 보이게 하고 싶다면
-    bShowMouseCursor = true;
+     bShowMouseCursor = true;
+
+
+     //MyplayerController.cpp
+     InputMappingContext = nullptr;
+     MoveAction = nullptr;
+     LookAction = nullptr;
+     JumpAction = nullptr;
+     SprintAction = nullptr;
+     CrouchAction = nullptr;
+
+
 }
 
 void ASevenPlayerController::BeginPlay()
@@ -42,7 +54,21 @@ void ASevenPlayerController::BeginPlay()
 
     SetInputMode(InputModeData);
 
+
+    //MyplayerController.cpp
+    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+        {
+            if (InputMappingContext)
+            {
+                Subsystem->AddMappingContext(InputMappingContext, 0);
+            }
+        }
+    }
 }
+
+
 
 // UI 업데이트 함수 추가
 void ASevenPlayerController::UpdateHUD (float HealthPercent, int32 KillCount, int32 CurrentAmmo, int32 TotalAmmo, FText WeaponName, UTexture2D* WeaponIcon)

@@ -31,11 +31,11 @@ void ADayNightManager::SetDayNightState(EDayNightState NewState)
         // Directional Light(태양광) 설정
         if (DirectionalLightActor)
         {
-            // 예: 태양이 위쪽에 있는 각도
+            // 태양이 위쪽에 있는 각도
             DirectionalLightActor->SetActorRotation(FRotator(-45.f, 0.f, 0.f));
 
             // 빛 세기 (낮: 좀 세게)
-            DirectionalLightActor->GetLightComponent()->SetIntensity(10000.f);
+            DirectionalLightActor->GetLightComponent()->SetIntensity(5000.f);
 
             // 빛 색상 (따뜻한 빛)
             DirectionalLightActor->GetLightComponent()->SetLightColor(FLinearColor(1.f, 0.95f, 0.9f));
