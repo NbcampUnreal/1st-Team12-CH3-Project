@@ -12,8 +12,10 @@ enum class EDayNightState : uint8
     Night UMETA(DisplayName = "Night")
 };
 
-UCLASS()
-class ADayNightManager : public AActor
+UCLASS(Blueprintable)
+
+class SEVENDAYS_API ADayNightManager : public AActor
+
 {
     GENERATED_BODY()
 
@@ -45,4 +47,12 @@ public:
     // 현재 상태 반환
     UFUNCTION(BlueprintPure, Category = "DayNight")
     EDayNightState GetCurrentState() const { return CurrentState; }
+
+    //Sky Light를 블루프린트에서 사용
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lighting", meta = (AllowPrivateAccess = "true"))
+    class USkyLightComponent* SkyLightComponent;
+
+
+
+
 };

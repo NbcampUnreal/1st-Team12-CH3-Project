@@ -2,6 +2,7 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "SevenPlayerController.h"
+#include "DayNightManager.h"
 #include "SevenUserWidget.h"
 
 ASevenGameModeBase::ASevenGameModeBase()
@@ -83,7 +84,6 @@ void ASevenGameModeBase::StartDayPhase()
     bIsNight = false;
     UE_LOG(LogTemp, Warning, TEXT("=== Day Phase Started ==="));
 
-    // HUD - 낮 아이콘
     if (ASevenPlayerController* PC = Cast<ASevenPlayerController>(GetWorld()->GetFirstPlayerController()))
     {
         if (PC->CurrentWidget)
@@ -94,7 +94,13 @@ void ASevenGameModeBase::StartDayPhase()
             }
         }
     }
+
+    if (DayNightManager)
+    {
+        DayNightManager->SetDayNightState(EDayNightState::Day);  // 기존 함수 사용!
+    }
 }
+
 
 void ASevenGameModeBase::EndDayPhase()
 {
@@ -118,6 +124,11 @@ void ASevenGameModeBase::StartNightPhase()
         }
     }
 
+    if (DayNightManager)
+    {
+        DayNightManager->SetDayNightState(EDayNightState::Night);  // 기존 함수 사용!
+    }
+
     // 밤 시간 세팅
     RemainingTime = NightDuration;
 
@@ -127,6 +138,7 @@ void ASevenGameModeBase::StartNightPhase()
     // 1초마다 UpdateTimer() -> 밤 카운트다운
     GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ASevenGameModeBase::UpdateTimer, 1.f, true);
 }
+
 
 void ASevenGameModeBase::EndNightPhase()
 {
@@ -182,3 +194,6 @@ void ASevenGameModeBase::OnPhaseTimeOver()
         EndNightPhase();
     }
 }
+
+
+
