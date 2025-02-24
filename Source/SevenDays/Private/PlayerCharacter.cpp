@@ -18,18 +18,18 @@ APlayerCharacter::APlayerCharacter()
 	FullBodyMeshComponent->bCastDynamicShadow = true;
 	FullBodyMeshComponent->bCastStaticShadow = true;
 
-	FPSMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPSMeshComponent"));
-	FPSMeshComponent->SetupAttachment(RootComponent);
-	FPSMeshComponent->bHiddenInGame = false;
-	FPSMeshComponent->bCastDynamicShadow = false;
-	FPSMeshComponent->bCastStaticShadow = false;
-
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->bUsePawnControlRotation = true;
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	FPSMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPSMeshComponent"));
+	FPSMeshComponent->SetupAttachment(SpringArmComponent);
+	FPSMeshComponent->bHiddenInGame = false;
+	FPSMeshComponent->bCastDynamicShadow = false;
+	FPSMeshComponent->bCastStaticShadow = false;
 	
 }
 
