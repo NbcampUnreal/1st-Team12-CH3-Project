@@ -37,4 +37,6 @@ public:
     // ÃÑ Á¡¼ö ¹ÝÈ¯
     UFUNCTION(BlueprintCallable, Category = "Score")
     int32 GetTotalScore() const { return TotalScore; }
+
+
 };

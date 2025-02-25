@@ -5,8 +5,6 @@
 #include "DayNightManager.h"
 #include "SevenGameModeBase.generated.h"
 
-
-
 UCLASS()
 class SEVENDAYS_API ASevenGameModeBase : public AGameModeBase
 {
@@ -45,6 +43,7 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniGame")
     bool bIsMiniGameActive;
 
+    // 낮/밤 전환을 관리하는 매니저
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight")
     ADayNightManager* DayNightManager;
 
@@ -69,16 +68,13 @@ protected:
     void StartNightPhase();
     void EndNightPhase();
 
-    private:
-
-    // 조명 참조
-   // UPROPERTY(EditAnywhere, Category = "DayNight")
-   // class ADirectionalLight* DirectionalLight;
-
-
-
     // 1초마다 갱신
     void UpdateTimer();
     void OnPhaseTimeOver();
 
+private:
+    // HUD 업데이트 (시간 및 낮/밤 표시)
+    void UpdateHUD();
+
+    void ToggleDayNight();
 };

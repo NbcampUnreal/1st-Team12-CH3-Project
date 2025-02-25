@@ -4,7 +4,6 @@
 #include "GameFramework/Actor.h"
 #include "DayNightManager.generated.h"
 
-// 낮/밤 상태를 나누는 Enum (원하는 대로 확장 가능)
 UENUM(BlueprintType)
 enum class EDayNightState : uint8
 {
@@ -12,47 +11,59 @@ enum class EDayNightState : uint8
     Night UMETA(DisplayName = "Night")
 };
 
-UCLASS(Blueprintable)
-
+UCLASS()
 class SEVENDAYS_API ADayNightManager : public AActor
-
 {
     GENERATED_BODY()
 
 public:
-    // Sets default values for this actor's properties
     ADayNightManager();
 
 protected:
-    // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
 public:
-    // 현재 낮/밤 상태
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DayNight")
     EDayNightState CurrentState;
 
-    // 에디터에서 할당할 Directional Light (주광)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lighting")
     class ADirectionalLight* DirectionalLightActor;
 
-    // 에디터에서 할당할 Sky Light
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lighting")
     class ASkyLight* SkyLightActor;
 
-    // 낮/밤 상태 전환 함수
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sky")
+    AActor* SkySphere;
+
+    // 낮/밤 상태
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight")
+    bool bIsDaytime;
+
     UFUNCTION(BlueprintCallable, Category = "DayNight")
-    void SetDayNightState(EDayNightState NewState);
-
-    // 현재 상태 반환
-    UFUNCTION(BlueprintPure, Category = "DayNight")
-    EDayNightState GetCurrentState() const { return CurrentState; }
-
-    //Sky Light를 블루프린트에서 사용
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lighting", meta = (AllowPrivateAccess = "true"))
-    class USkyLightComponent* SkyLightComponent;
+    void SetSunHeight(float NewSunHeight);
 
 
+    UFUNCTION(BlueprintCallable, Category = "DayNight")
+    void SetDayNightState(EDayNightState NewState, float DayDuration);
+
+    void SmoothTransitionSunHeight();    
+    
+    
+    void UpdateLighting();
+    void UpdateSkySphere();
+    // 낮/밤에 따른 SunHeight 업데이트
+    void UpdateSunHeight();
+    // 추가 멤버 변수: 전환에 걸리는 시간 추적용
+    float TransitionElapsedTime;
+    float TransitionTotalTime;
+
+private:
 
 
+
+    float CurrentSunHeight;
+    float TargetSunHeight;
+    float SunHeightInterpSpeed;
+
+    FTimerHandle SmoothTransitionHandle;
 };

@@ -2,7 +2,6 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "SevenPlayerController.h"
-#include "DayNightManager.h"
 #include "SevenUserWidget.h"
 
 ASevenGameModeBase::ASevenGameModeBase()
@@ -13,8 +12,6 @@ ASevenGameModeBase::ASevenGameModeBase()
     NightDuration = 20;
     RemainingTime = 0;
 
-    // 기본적으로 미니게임 사용 여부를 false로 두거나,
-    // 특정 상황에서 true로 바꿀 수 있음
     bUseMiniGame = false;
     bIsMiniGameActive = false;
 }
@@ -23,9 +20,23 @@ void ASevenGameModeBase::StartPlay()
 {
     Super::StartPlay();
 
-    // 게임 시작 시 낮
+    // DayNightManager가 설정되어 있지 않으면 스폰
+    if (!DayNightManager)
+    {
+        DayNightManager = GetWorld()->SpawnActor<ADayNightManager>();
+        UE_LOG(LogTemp, Warning, TEXT("Spawned new DayNightManager instance!"));
+    }
+
+    if (DayNightManager)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DayNightManager is now set: %s"), *DayNightManager->GetName());
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to set DayNightManager!"));
+    }
+
     StartDayPhase();
-    // 그리고 웨이브 시작
     StartWave();
 }
 
@@ -33,14 +44,9 @@ void ASevenGameModeBase::StartPlay()
 void ASevenGameModeBase::StartWave()
 {
     UE_LOG(LogTemp, Warning, TEXT("[Wave %d] START"), CurrentWave);
-
-    // 낮 웨이브 시간
     RemainingTime = DayWaveDuration;
 
-    // 타이머 리셋
     GetWorldTimerManager().ClearTimer(PhaseTimerHandle);
-
-    // 매초 UpdateTimer() -> 시간 깎기
     GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ASevenGameModeBase::UpdateTimer, 1.f, true);
 }
 
@@ -49,21 +55,15 @@ void ASevenGameModeBase::EndWave()
     UE_LOG(LogTemp, Warning, TEXT("[Wave %d] END"), CurrentWave);
     CurrentWave++;
 
-    // 타이머 정리
     GetWorldTimerManager().ClearTimer(PhaseTimerHandle);
 
-    // 미니게임 선택 (bUseMiniGame가 true라면)
     if (bUseMiniGame)
     {
         bIsMiniGameActive = true;
-        // 여기서 미니게임 UI/맵 열기 등 실제 로직
-        // 미니게임 끝나면 OnMiniGameCompleted() 호출
+        // 미니게임 UI/맵 등 실제 로직 후 OnMiniGameCompleted() 호출
     }
     else
     {
-        // 미니게임이 없으면 곧바로 밤으로 넘어가거나
-        // or 일정 타이머 후 밤 시작
-        // 여기서는 그냥 즉시 밤 시작
         StartNightPhase();
     }
 }
@@ -73,16 +73,22 @@ void ASevenGameModeBase::OnMiniGameCompleted()
 {
     UE_LOG(LogTemp, Warning, TEXT("MiniGame Completed. Starting Night Phase..."));
     bIsMiniGameActive = false;
-
-    // 미니게임이 끝나야 밤 시작
     StartNightPhase();
 }
 
 // -------------------- 낮/밤 전환 --------------------
+// 중복된 StartDayPhase 중, 아래 버전으로 유지 (HUD 업데이트 및 태양 높이 설정 포함)
 void ASevenGameModeBase::StartDayPhase()
 {
     bIsNight = false;
     UE_LOG(LogTemp, Warning, TEXT("=== Day Phase Started ==="));
+
+    if (DayNightManager)
+    {
+        // 낮 시작 시 SunHeight를 0.7로 설정한 후, 낮 지속시간 동안 -0.1로 서서히 변화
+        DayNightManager->SetSunHeight(0.7f);
+        DayNightManager->SetDayNightState(EDayNightState::Day, DayWaveDuration);
+    }
 
     if (ASevenPlayerController* PC = Cast<ASevenPlayerController>(GetWorld()->GetFirstPlayerController()))
     {
@@ -94,18 +100,15 @@ void ASevenGameModeBase::StartDayPhase()
             }
         }
     }
-
-    if (DayNightManager)
-    {
-        DayNightManager->SetDayNightState(EDayNightState::Day);  // 기존 함수 사용!
-    }
 }
-
 
 void ASevenGameModeBase::EndDayPhase()
 {
     UE_LOG(LogTemp, Warning, TEXT("=== Day Phase Ended ==="));
-    // 필요시 사용
+    if (DayNightManager)
+    {
+        DayNightManager->SetSunHeight(-1.0f);
+    }
 }
 
 void ASevenGameModeBase::StartNightPhase()
@@ -113,6 +116,17 @@ void ASevenGameModeBase::StartNightPhase()
     bIsNight = true;
     UE_LOG(LogTemp, Warning, TEXT("=== Night Phase Started ==="));
 
+    if (DayNightManager)
+    {
+        // 밤 전환 시 태양 높이를 즉시 -0.1로 설정 (보간 없이)
+        DayNightManager->SetDayNightState(EDayNightState::Night, 0);
+    }
+
+    RemainingTime = NightDuration;
+
+    GetWorldTimerManager().ClearTimer(PhaseTimerHandle);
+    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ASevenGameModeBase::UpdateTimer, 1.f, true);
+
     if (ASevenPlayerController* PC = Cast<ASevenPlayerController>(GetWorld()->GetFirstPlayerController()))
     {
         if (PC->CurrentWidget)
@@ -123,31 +137,14 @@ void ASevenGameModeBase::StartNightPhase()
             }
         }
     }
-
-    if (DayNightManager)
-    {
-        DayNightManager->SetDayNightState(EDayNightState::Night);  // 기존 함수 사용!
-    }
-
-    // 밤 시간 세팅
-    RemainingTime = NightDuration;
-
-    // 타이머 리셋
-    GetWorldTimerManager().ClearTimer(PhaseTimerHandle);
-
-    // 1초마다 UpdateTimer() -> 밤 카운트다운
-    GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ASevenGameModeBase::UpdateTimer, 1.f, true);
 }
-
 
 void ASevenGameModeBase::EndNightPhase()
 {
     UE_LOG(LogTemp, Warning, TEXT("=== Night Phase Ended ==="));
 
-    // 타이머 정리
     GetWorldTimerManager().ClearTimer(PhaseTimerHandle);
-
-    // 밤 끝나면 낮 + 새 웨이브
+    // 밤 종료 후 낮 전환 및 새 웨이브 시작
     StartDayPhase();
     StartWave();
 }
@@ -159,7 +156,6 @@ void ASevenGameModeBase::UpdateTimer()
     {
         RemainingTime--;
 
-        // HUD
         if (ASevenPlayerController* PC = Cast<ASevenPlayerController>(GetWorld()->GetFirstPlayerController()))
         {
             if (PC->CurrentWidget)
@@ -185,15 +181,20 @@ void ASevenGameModeBase::OnPhaseTimeOver()
 
     if (!bIsNight)
     {
-        // 낮 끝
         EndWave();
     }
     else
     {
-        // 밤 끝
         EndNightPhase();
     }
 }
 
+void ASevenGameModeBase::UpdateHUD()
+{
+    // 추가적인 HUD 업데이트 로직 구현 가능
+}
 
-
+void ASevenGameModeBase::ToggleDayNight()
+{
+    // 필요 시 낮/밤 토글 기능 구현
+}
