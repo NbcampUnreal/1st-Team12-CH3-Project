@@ -2,13 +2,25 @@
 #include "SevenPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "SevenUserWidget.h"
+#include "EnhancedInputSubsystems.h"
+
 
 
 
 ASevenPlayerController::ASevenPlayerController()
 {
-    // 마우스 커서 보이게 하고 싶다면
-    bShowMouseCursor = true;
+     bShowMouseCursor = true;
+
+
+     //MyplayerController.cpp
+     InputMappingContext = nullptr;
+     MoveAction = nullptr;
+     LookAction = nullptr;
+     JumpAction = nullptr;
+     SprintAction = nullptr;
+     CrouchAction = nullptr;
+
+
 }
 
 void ASevenPlayerController::BeginPlay()
@@ -18,12 +30,12 @@ void ASevenPlayerController::BeginPlay()
     // 프로젝트 세팅 또는 에디터에서 BP로 만든 HUDWidgetClass를 지정해 둔 상태라고 가정
     if (HUDWidgetClass)
     {
-        CurrentWidget = CreateWidget<UUserWidget>(this, HUDWidgetClass);
+        // USevenUserWidget 사용
+        CurrentWidget = CreateWidget<USevenUserWidget>(this, HUDWidgetClass);
         if (CurrentWidget)
         {
             CurrentWidget->AddToViewport();
         }
-
     }
 
     // 입력 모드 설정(마우스 이용 UI 조작 가능하게)
@@ -42,7 +54,21 @@ void ASevenPlayerController::BeginPlay()
 
     SetInputMode(InputModeData);
 
+
+    //MyplayerController.cpp
+    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+        {
+            if (InputMappingContext)
+            {
+                Subsystem->AddMappingContext(InputMappingContext, 0);
+            }
+        }
+    }
 }
+
+
 
 // UI 업데이트 함수 추가
 void ASevenPlayerController::UpdateHUD (float HealthPercent, int32 KillCount, int32 CurrentAmmo, int32 TotalAmmo, FText WeaponName, UTexture2D* WeaponIcon)
@@ -53,5 +79,24 @@ void ASevenPlayerController::UpdateHUD (float HealthPercent, int32 KillCount, in
         HUD->UpdateKillCount(KillCount);
         HUD->UpdateAmmo(CurrentAmmo, TotalAmmo);
         HUD->UpdateWeapon(WeaponName, WeaponIcon);
+    }
+}
+
+#include "SevenGameStateBase.h"
+#include "Kismet/GameplayStatics.h"
+
+void ASevenPlayerController::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+    AGameStateBase* BaseGS = UGameplayStatics::GetGameState(this);
+    if (BaseGS)
+    {
+        ASevenGameStateBase* SevenGS = Cast<ASevenGameStateBase>(BaseGS);
+        if (SevenGS && CurrentWidget)
+        {
+            CurrentWidget->UpdateZombieCountText(SevenGS->GetRemainingZombies(),
+                SevenGS->GetTotalZombies());
+        }
     }
 }

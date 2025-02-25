@@ -25,6 +25,10 @@ public:
     UPROPERTY(meta = (BindWidget)) UImage* MoonImage;
     UPROPERTY(meta = (BindWidget)) UTextBlock* TimerText;
 
+    // 외부에서 "남은/전체"를 받아와 텍스트 설정하는 함수
+    UFUNCTION(BlueprintCallable, Category = "HUD")
+    void UpdateZombieCountText(int32 InRemaining, int32 InTotal);
+
     // UI 업데이트 함수
     UFUNCTION(BlueprintCallable, Category = "DayNight")
     void UpdateDayNightCycle(bool bIsNight, UTexture2D* SunTexture, UTexture2D* MoonTexture);
@@ -36,4 +40,11 @@ public:
     void UpdateKillCount(int32 KillCount);
     void UpdateAmmo(int32 CurrentAmmo, int32 TotalAmmo);
     void UpdateWeapon(FText WeaponName, UTexture2D* WeaponIcon);
+
+protected:
+    virtual void NativeConstruct() override;
+
+    // UMG 디자이너에 TextBlock(이름: ZombiesText) 배치 + BindWidget
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* ZombiesText;
 };

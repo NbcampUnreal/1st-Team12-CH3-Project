@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "DayNightManager.h"
 #include "SevenGameModeBase.generated.h"
 
 UCLASS()
@@ -42,6 +43,10 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MiniGame")
     bool bIsMiniGameActive;
 
+    // 낮/밤 전환을 관리하는 매니저
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DayNight")
+    ADayNightManager* DayNightManager;
+
     // 1초 타이머 핸들
     UPROPERTY()
     FTimerHandle PhaseTimerHandle;
@@ -66,4 +71,10 @@ protected:
     // 1초마다 갱신
     void UpdateTimer();
     void OnPhaseTimeOver();
+
+private:
+    // HUD 업데이트 (시간 및 낮/밤 표시)
+    void UpdateHUD();
+
+    void ToggleDayNight();
 };
