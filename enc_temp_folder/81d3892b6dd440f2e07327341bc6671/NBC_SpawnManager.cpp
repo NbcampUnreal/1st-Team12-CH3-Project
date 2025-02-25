@@ -15,8 +15,7 @@ void ANBC_SpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CreateZombie(10,GetActorLocation());
-
+	CreateZombie(10);
 }
 
 // Called every frame
@@ -27,12 +26,10 @@ void ANBC_SpawnManager::Tick(float DeltaTime)
 }
 
 // 좀비 생성 코드
-AActor* ANBC_SpawnManager::GetEnemy(const FVector SpawnPoint)
+void ANBC_SpawnManager::GetEnemy()
 {
-	AActor* ResultPawn = nullptr;
-
 	if (ZombiesRef.Num() == 0)
-		return nullptr;
+		return;
 
 	if (!ZombieArr.IsEmpty())
 	{
@@ -61,15 +58,11 @@ AActor* ANBC_SpawnManager::GetEnemy(const FVector SpawnPoint)
 		}
 
 		//소환 코드
-		ResultPawn = GetWorld()->SpawnActor<AActor>(ZombiesRef[index],
-			SpawnPoint,
+		AActor* ResultPawn = GetWorld()->SpawnActor<AActor>(ZombiesRef[index],
+			GetActorLocation(),
 			FRotator::ZeroRotator,
 			SpawnParams);
-		//
 	}
-
-	return ResultPawn;
-
 }
 
 // 좀비 배열 받기
@@ -88,11 +81,11 @@ void ANBC_SpawnManager::SetEnemy(AActor* zombie)
 }
 
 // ---------- 좀비 생성 코드 -----------------
-void ANBC_SpawnManager::CreateZombie(int32 count, const FVector SpawnPoint)
+void ANBC_SpawnManager::CreateZombie(int32 count)
 {
 	for (int32 i = 0; i < count; i++)
 	{
-		AActor* A = GetEnemy(SpawnPoint);
+		GetEnemy();
 	}
 }
 

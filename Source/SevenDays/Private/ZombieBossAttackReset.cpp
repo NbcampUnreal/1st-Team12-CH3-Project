@@ -4,7 +4,7 @@
 #include "ZombieBossAttackReset.h"
 #include "ZombieBossAnimInstance.h"
 
-
+//좀비 공격 히트 박스 꺼주기
 void UZombieBossAttackReset::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (MeshComp)
