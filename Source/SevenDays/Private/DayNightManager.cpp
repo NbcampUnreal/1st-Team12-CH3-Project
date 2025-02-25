@@ -2,75 +2,161 @@
 #include "Engine/DirectionalLight.h"
 #include "Engine/SkyLight.h"
 #include "Components/LightComponent.h"
-#include "Components/SkyLightComponent.h" // ★ 이 부분 추가
-
+#include "Components/SkyLightComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Misc/OutputDeviceNull.h"
+#include "EngineUtils.h"
 
 ADayNightManager::ADayNightManager()
 {
-    PrimaryActorTick.bCanEverTick = false; // 필요에 따라 true로
-    CurrentState = EDayNightState::Day; // 시작 시 낮으로 설정
+    PrimaryActorTick.bCanEverTick = false;
+    CurrentState = EDayNightState::Day;
+    // 낮 상태의 SunHeight는 BP_Sky_Sphere 기준 0.6, 밤은 -1
+    CurrentSunHeight = 0.6f;
+    TargetSunHeight = -1.f;
+    SunHeightInterpSpeed = 0.01f;  // 기존 변수, 사용 안할 수도 있음
+    bIsDaytime = true; // 기본은 낮
+
+    TransitionElapsedTime = 0.f;
+    TransitionTotalTime = 1.f; // 초기값, 실제 전환 시 DayDuration으로 설정
 }
 
 void ADayNightManager::BeginPlay()
 {
     Super::BeginPlay();
 
-    // 시작할 때 기본 상태 지정 (예: 낮 상태로 시작)
-    SetDayNightState(CurrentState);
-}
-
-void ADayNightManager::SetDayNightState(EDayNightState NewState)
-{
-    CurrentState = NewState;
-
-    // 1) 만약 Day(낮) 상태
-    if (NewState == EDayNightState::Day)
+    UWorld* World = GetWorld();
+    if (!World)
     {
-        UE_LOG(LogTemp, Log, TEXT("Switching to DAY mode"));
-
-        // Directional Light(태양광) 설정
-        if (DirectionalLightActor)
-        {
-            // 태양이 위쪽에 있는 각도
-            DirectionalLightActor->SetActorRotation(FRotator(-45.f, 0.f, 0.f));
-
-            // 빛 세기 (낮: 좀 세게)
-            DirectionalLightActor->GetLightComponent()->SetIntensity(5000.f);
-
-            // 빛 색상 (따뜻한 빛)
-            DirectionalLightActor->GetLightComponent()->SetLightColor(FLinearColor(1.f, 0.95f, 0.9f));
-        }
-
-        // Sky Light 세기 (낮에는 1.0 정도)
-        if (SkyLightActor)
-        {
-            SkyLightActor->GetLightComponent()->SetIntensity(1.0f);
-        }
+        UE_LOG(LogTemp, Error, TEXT("World is NULL! Lighting setup failed."));
+        return;
     }
-    // 2) Night(밤) 상태
+
+    // DirectionalLight 찾기
+    for (TActorIterator<ADirectionalLight> It(World); It; ++It)
+    {
+        DirectionalLightActor = *It;
+        break;
+    }
+
+    // SkyLight 찾기
+    for (TActorIterator<ASkyLight> It(World); It; ++It)
+    {
+        SkyLightActor = *It;
+        break;
+    }
+
+
+
+    // "BP_Sky_Sphere" 태그가 붙은 액터 찾기
+    TArray<AActor*> FoundActors;
+    UGameplayStatics::GetAllActorsWithTag(World, FName("BP_Sky_Sphere"), FoundActors);
+
+    if (FoundActors.Num() > 0)
+    {
+        SkySphere = FoundActors[0];
+        UE_LOG(LogTemp, Warning, TEXT("BP_Sky_Sphere found: %s"), *SkySphere->GetName());
+    }
     else
     {
-        UE_LOG(LogTemp, Log, TEXT("Switching to NIGHT mode"));
+        UE_LOG(LogTemp, Error, TEXT("No BP_Sky_Sphere found in the scene!"));
+    }
+}
 
-        if (DirectionalLightActor)
-        {
-            // 예: 태양을 지평선 아래로
-            DirectionalLightActor->SetActorRotation(FRotator(180.f, 0.f, 0.f));
-
-            // 밤에는 빛 세기를 약하게 (혹은 0으로 끄기)
-            DirectionalLightActor->GetLightComponent()->SetIntensity(0.5f);
-
-            // 달빛스럽게 약간 푸른 톤
-            DirectionalLightActor->GetLightComponent()->SetLightColor(FLinearColor(0.7f, 0.7f, 1.f));
-        }
-
-        // 밤에는 Sky Light도 약하게
-        if (SkyLightActor)
-        {
-            SkyLightActor->GetLightComponent()->SetIntensity(0.2f);
-        }
+// 중복 제거: 첫번째 SetSunHeight 함수 제거하고, 아래 SkySphere 기반 함수만 사용
+void ADayNightManager::SetSunHeight(float NewSunHeight)
+{
+    CurrentSunHeight = NewSunHeight;
+    if (!SkySphere)
+    {
+        UE_LOG(LogTemp, Error, TEXT("SkySphere is NULL! Cannot update SunHeight."));
+        return;
     }
 
-    // (추가) Exponential Height Fog, PostProcessVolume 등 다른 액터도 레퍼런스 받아서 값 조절 가능
-    //       (예: 밤에 Fog 색상 진하게, 노출(Exposure) 낮추기 등)
+    FOutputDeviceNull OutputDevice;
+    FString Command = FString::Printf(TEXT("SetSunHeight %f"), NewSunHeight);
+    SkySphere->CallFunctionByNameWithArguments(*Command, OutputDevice, nullptr, true);
+
+    UE_LOG(LogTemp, Warning, TEXT("SkySphere SunHeight updated to: %f"), NewSunHeight);
+}
+
+void ADayNightManager::SetDayNightState(EDayNightState NewState, float DayDuration)
+{
+    CurrentState = NewState;
+    UpdateLighting();
+
+    if (NewState == EDayNightState::Day)
+    {
+        // 낮일 때: 태양 높이를 0.7에서 -1.0로 서서히 변화
+        CurrentSunHeight = 0.7f;
+        TargetSunHeight = -1.0f;
+        SunHeightInterpSpeed = 0.8f / DayDuration;
+
+        GetWorldTimerManager().SetTimer(SmoothTransitionHandle, this, &ADayNightManager::SmoothTransitionSunHeight, 0.1f, true);
+    }
+    else
+    {
+        GetWorldTimerManager().ClearTimer(SmoothTransitionHandle);
+        SetSunHeight(-1.0f);
+    }
+}
+
+void ADayNightManager::UpdateLighting()
+{
+    if (CurrentState == EDayNightState::Day)
+    {
+        if (DirectionalLightActor)
+        {
+            DirectionalLightActor->SetActorRotation(FRotator(-45.f, 0.f, 0.f));
+        }
+    }
+    else
+    {
+        if (DirectionalLightActor)
+        {
+            DirectionalLightActor->SetActorRotation(FRotator(180.f, 0.f, 0.f));
+        }
+    }
+}
+
+void ADayNightManager::UpdateSkySphere()
+{
+    // 필요 시 SkySphere 업데이트 로직 추가
+}
+
+void ADayNightManager::SmoothTransitionSunHeight()
+{
+    if (!SkySphere)
+    {
+        GetWorldTimerManager().ClearTimer(SmoothTransitionHandle);
+        return;
+    }
+
+    CurrentSunHeight = FMath::Lerp(CurrentSunHeight, TargetSunHeight, SunHeightInterpSpeed);
+    SetSunHeight(CurrentSunHeight);
+
+    if (FMath::IsNearlyEqual(CurrentSunHeight, TargetSunHeight, 0.05f))
+    {
+        GetWorldTimerManager().ClearTimer(SmoothTransitionHandle);
+    }
+}
+
+void ADayNightManager::UpdateSunHeight()
+{
+    if (SkySphere)
+    {
+        UFunction* SetSunHeightFunc = SkySphere->FindFunction(FName("SetSunHeight"));
+        if (SetSunHeightFunc)
+        {
+            struct FSunHeightParams
+            {
+                float SunHeight;
+            };
+
+            FSunHeightParams Params;
+            Params.SunHeight = bIsDaytime ? 0.6f : -1.0f; // 낮이면 0.6, 밤이면 -1.0
+
+            SkySphere->ProcessEvent(SetSunHeightFunc, &Params);
+        }
+    }
 }
