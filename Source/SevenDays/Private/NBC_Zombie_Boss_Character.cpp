@@ -2,11 +2,17 @@
 
 
 #include "NBC_Zombie_Boss_Character.h"
+#include "Components/BoxComponent.h"
 
 
 ANBC_Zombie_Boss_Character::ANBC_Zombie_Boss_Character()
 {
-	
+
+	JumpAttackCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("JumpBoxCollision"));
+	JumpAttackCollision->SetupAttachment(GetMesh());
+	JumpAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	JumpAttackCollision->OnComponentHit.AddDynamic(this, &ANBC_Zombie_Boss_Character::CollisionOnHit);
 }
 
 void ANBC_Zombie_Boss_Character::PostInitializeComponents()
@@ -23,12 +29,17 @@ void ANBC_Zombie_Boss_Character::PostInitializeComponents()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Not cast boss zombie anim"));
 		}
+
+		
+
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No have boss zombie anim"));
 
 	}
+
+
 }
 
 void ANBC_Zombie_Boss_Character::BeginPlay()
@@ -48,7 +59,8 @@ void ANBC_Zombie_Boss_Character::ActivePattern(int32 patternNumber)
 
 void ANBC_Zombie_Boss_Character::JumpAttackPattern()
 {
-	
+	JumpAttackCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
 }
 
 void ANBC_Zombie_Boss_Character::BreathPattern()

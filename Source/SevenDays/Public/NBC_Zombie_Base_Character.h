@@ -8,6 +8,7 @@
 #include "NBC_Zombie_Base_Character.generated.h"
 
 class UBoxComponent;
+class ANBC_SpawnManager;
 
 UCLASS()
 class SEVENDAYS_API ANBC_Zombie_Base_Character : public ACharacter
@@ -18,6 +19,7 @@ public:
 	// Sets default values for this character's properties
 	ANBC_Zombie_Base_Character();
 
+	//머리 콜리전
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* HeadCollision;
 
@@ -31,26 +33,36 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+
+public:	
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	//공격 범위 껏나 키기
 	UFUNCTION(BlueprintCallable)
 	virtual void ZombieAttack();
+	// 공격 범위 끄기
 	UFUNCTION(BlueprintCallable)
 	virtual void ZombieAttackEnd();
 
-protected:
 
+	void Death();
+
+protected:
+	//좀비스텟
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FNBC_ZombieStruct ZombieStat;
 
+	//콜리전함수용
 	UFUNCTION()
 	virtual void CollisionOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit);
 
-	FTimerHandle HitDelayTimer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TEST")
+	ANBC_SpawnManager* TestSpawnManager;
+
 
 };

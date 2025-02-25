@@ -5,7 +5,9 @@
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "NBC_SpawnManager.h"
 #include "NBC_Zombie_AIController.h"
+#include "SevenGameStateBase.h"
 
 
 // Sets default values
@@ -32,6 +34,9 @@ void ANBC_Zombie_Base_Character::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	FTimerHandle Die;
+
+	GetWorldTimerManager().SetTimer(Die, this, &ANBC_Zombie_Base_Character::Death, 5, false);
 }
 
 // Called every frame
@@ -39,6 +44,17 @@ void ANBC_Zombie_Base_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ANBC_Zombie_Base_Character::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+
+	//투명해제하는순간콜리전 켜주기
+	if (!bNewHidden)
+	{
+		SetActorEnableCollision(true);
+	}
 }
 
 float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -66,13 +82,49 @@ void ANBC_Zombie_Base_Character::ZombieAttackEnd()
 	HitCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ANBC_Zombie_Base_Character::Death()
+{
+	//테스트용
+	ZombieStat.CurrentHp = 0;
+
+	if (ZombieStat.CurrentHp <= 0)
+	{
+		if (!TestSpawnManager)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("nullptr == zombie nullptr"));
+		}
+
+
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->SetCollisionProfileName("Ragdoll");
+
+		//GetWorld()->GetGameState()->GetSpawnManager(this);
+		if(TestSpawnManager != nullptr)
+			TestSpawnManager->SetEnemy(this);
+
+		if(ASevenGameStateBase* test = Cast< ASevenGameStateBase>(GetWorld()->GetGameState()))
+			test->AddScore(1);
+
+
+	}
+
+}
+
 void ANBC_Zombie_Base_Character::CollisionOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	//공격 되었으면 더이상 공격 금지
+	if (!HitCollision)
+		return;
+	//콜리전활성화
+	HitCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	//좀비 피격 
 	if (OtherActor && OtherActor != this)
 	{
 		 //OtherActor->TakeDamage(10, )
 	}
+
+	
 }
 
 

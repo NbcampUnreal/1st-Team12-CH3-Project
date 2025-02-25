@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ANIM")
 	UZombieBossAnimInstance* AnimInstance;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ANIM")
+	UBoxComponent* JumpAttackCollision;
+
 	//실질적으로 불려질 패턴 // 델리게이트처럼 함수를 저장 하는게 있다면 좋을것 같다.
 	UFUNCTION(BlueprintCallable)
 	void ActivePattern(int32 patternNumber);	
