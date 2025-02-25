@@ -30,12 +30,12 @@ void ASevenPlayerController::BeginPlay()
     // 프로젝트 세팅 또는 에디터에서 BP로 만든 HUDWidgetClass를 지정해 둔 상태라고 가정
     if (HUDWidgetClass)
     {
-        CurrentWidget = CreateWidget<UUserWidget>(this, HUDWidgetClass);
+        // USevenUserWidget 사용
+        CurrentWidget = CreateWidget<USevenUserWidget>(this, HUDWidgetClass);
         if (CurrentWidget)
         {
             CurrentWidget->AddToViewport();
         }
-
     }
 
     // 입력 모드 설정(마우스 이용 UI 조작 가능하게)
@@ -79,5 +79,24 @@ void ASevenPlayerController::UpdateHUD (float HealthPercent, int32 KillCount, in
         HUD->UpdateKillCount(KillCount);
         HUD->UpdateAmmo(CurrentAmmo, TotalAmmo);
         HUD->UpdateWeapon(WeaponName, WeaponIcon);
+    }
+}
+
+#include "SevenGameStateBase.h"
+#include "Kismet/GameplayStatics.h"
+
+void ASevenPlayerController::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+    AGameStateBase* BaseGS = UGameplayStatics::GetGameState(this);
+    if (BaseGS)
+    {
+        ASevenGameStateBase* SevenGS = Cast<ASevenGameStateBase>(BaseGS);
+        if (SevenGS && CurrentWidget)
+        {
+            CurrentWidget->UpdateZombieCountText(SevenGS->GetRemainingZombies(),
+                SevenGS->GetTotalZombies());
+        }
     }
 }

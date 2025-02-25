@@ -3,7 +3,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h" 
+#include "sevenUserWidget.h"
 #include "SevenPlayerController.generated.h"
+
 
 class USevenHUDWidget;
 class UInputMappingContext;
@@ -15,7 +17,9 @@ class SEVENDAYS_API ASevenPlayerController : public APlayerController
     GENERATED_BODY()
 
 protected:
-    virtual void BeginPlay() override;
+     virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override; // Tick 함수 오버라이드
+
 
 public:
 
@@ -24,10 +28,6 @@ public:
 	//UI
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateHUD(float HealthPercent, int32 KillCount, int32 CurrentAmmo, int32 TotalAmmo, FText WeaponName, UTexture2D* WeaponIcon);
-
-    UPROPERTY()
-    UUserWidget* CurrentWidget;
-
 
 	//Character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input|IMC")
@@ -48,13 +48,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* CrouchAction;
 
+	UPROPERTY(BlueprintReadOnly, Category = "UI")
+	USevenUserWidget* CurrentWidget;
 
 protected:
 
 	//UI
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
-
-    TSubclassOf<UUserWidget> HUDWidgetClass;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	TSubclassOf<USevenUserWidget> HUDWidgetClass;
 
 };
