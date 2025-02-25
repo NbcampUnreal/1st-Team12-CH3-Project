@@ -63,7 +63,7 @@ void ADayNightManager::BeginPlay()
     }
 }
 
-// 중복 제거: 첫번째 SetSunHeight 함수 제거하고, 아래 SkySphere 기반 함수만 사용
+
 void ADayNightManager::SetSunHeight(float NewSunHeight)
 {
     CurrentSunHeight = NewSunHeight;
@@ -77,18 +77,28 @@ void ADayNightManager::SetSunHeight(float NewSunHeight)
     FString Command = FString::Printf(TEXT("SetSunHeight %f"), NewSunHeight);
     SkySphere->CallFunctionByNameWithArguments(*Command, OutputDevice, nullptr, true);
 
+    // SkySphere 머티리얼 업데이트
+    SkySphere->CallFunctionByNameWithArguments(TEXT("UpdateMaterial"), OutputDevice, nullptr, true);
+
+    // SkyLight 업데이트
+    if (SkyLightActor && SkyLightActor->GetLightComponent())
+    {
+        SkyLightActor->GetLightComponent()->MarkRenderStateDirty();
+    }
+
     UE_LOG(LogTemp, Warning, TEXT("SkySphere SunHeight updated to: %f"), NewSunHeight);
 }
+
 
 void ADayNightManager::SetDayNightState(EDayNightState NewState, float DayDuration)
 {
     CurrentState = NewState;
-    UpdateLighting();
+    UpdateLighting(); // 방향성 조명 업데이트
 
     if (NewState == EDayNightState::Day)
     {
-        // 낮일 때: 태양 높이를 0.7에서 -1.0로 서서히 변화
-        CurrentSunHeight = 0.7f;
+        // 낮일 때: 태양 높이를 0.6에서 -1.0로 서서히 변화
+        CurrentSunHeight = 0.6f;
         TargetSunHeight = -1.0f;
         SunHeightInterpSpeed = 0.8f / DayDuration;
 
@@ -96,10 +106,25 @@ void ADayNightManager::SetDayNightState(EDayNightState NewState, float DayDurati
     }
     else
     {
+        // 타이머 중지 후 즉시 밤 상태 적용
         GetWorldTimerManager().ClearTimer(SmoothTransitionHandle);
         SetSunHeight(-1.0f);
     }
+
+    //  SkySphere 머티리얼 강제 업데이트
+    if (SkySphere)
+    {
+        FOutputDeviceNull OutputDevice;
+        SkySphere->CallFunctionByNameWithArguments(TEXT("UpdateMaterial"), OutputDevice, nullptr, true);
+    }
+
+    //  SkyLight 업데이트 (조명 반영)
+    if (SkyLightActor && SkyLightActor->GetLightComponent())
+    {
+        SkyLightActor->GetLightComponent()->MarkRenderStateDirty();
+    }
 }
+
 
 void ADayNightManager::UpdateLighting()
 {

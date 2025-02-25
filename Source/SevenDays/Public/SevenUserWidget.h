@@ -29,6 +29,8 @@ public:
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateZombieCountText(int32 InRemaining, int32 InTotal);
 
+
+
     // UI 업데이트 함수
     UFUNCTION(BlueprintCallable, Category = "DayNight")
     void UpdateDayNightCycle(bool bIsNight, UTexture2D* SunTexture, UTexture2D* MoonTexture);

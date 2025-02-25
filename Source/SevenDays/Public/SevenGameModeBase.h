@@ -3,7 +3,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "DayNightManager.h"
+#include "NBC_SpawnManager.h"
 #include "SevenGameModeBase.generated.h"
+
+
 
 UCLASS()
 class SEVENDAYS_API ASevenGameModeBase : public AGameModeBase
@@ -13,8 +16,20 @@ class SEVENDAYS_API ASevenGameModeBase : public AGameModeBase
 public:
     ASevenGameModeBase();
 
+    // 웨이브 시작/종료
+    UFUNCTION(BlueprintCallable, Category = "Wave")
+    void StartWave();
+    UFUNCTION(BlueprintCallable, Category = "Wave")
+    void EndWave();
+
 protected:
+
+
     virtual void StartPlay() override;
+
+    // 스폰 매니저 추가
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+    ANBC_SpawnManager* SpawnManager; 
 
     // 현재 웨이브
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
@@ -51,12 +66,10 @@ protected:
     UPROPERTY()
     FTimerHandle PhaseTimerHandle;
 
+
+
 protected:
-    // 웨이브 시작/종료
-    UFUNCTION(BlueprintCallable, Category = "Wave")
-    void StartWave();
-    UFUNCTION(BlueprintCallable, Category = "Wave")
-    void EndWave();
+
 
     // 미니게임 로직
     UFUNCTION(BlueprintCallable, Category = "MiniGame")
