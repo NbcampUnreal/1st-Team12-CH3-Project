@@ -3,6 +3,8 @@
 #include "TimerManager.h"
 #include "SevenPlayerController.h"
 #include "SevenUserWidget.h"
+#include "SevenGameStateBase.h"
+#include "NBC_SpawnManager.h" // 헤더 추가
 
 ASevenGameModeBase::ASevenGameModeBase()
 {
@@ -14,6 +16,8 @@ ASevenGameModeBase::ASevenGameModeBase()
 
     bUseMiniGame = false;
     bIsMiniGameActive = false;
+
+    SpawnManager = nullptr;  // nullptr 초기화
 }
 
 void ASevenGameModeBase::StartPlay()
@@ -38,6 +42,13 @@ void ASevenGameModeBase::StartPlay()
 
     StartDayPhase();
     StartWave();
+
+    // SpawnManager가 설정되지 않았다면 찾기
+    SpawnManager = GetWorld()->SpawnActor<ANBC_SpawnManager>();
+    if (!SpawnManager)
+    {
+        UE_LOG(LogTemp, Error, TEXT("SpawnManager not found!"));
+    }
 }
 
 // -------------------- 웨이브 로직 --------------------
@@ -45,6 +56,20 @@ void ASevenGameModeBase::StartWave()
 {
     UE_LOG(LogTemp, Warning, TEXT("[Wave %d] START"), CurrentWave);
     RemainingTime = DayWaveDuration;
+
+    // 좀비 생성
+    if (SpawnManager)
+    {
+        int32 SpawnCount = CurrentWave * 5; // 예제: 웨이브마다 5마리씩 증가
+        SpawnManager->CreateZombie(SpawnCount);
+
+        ASevenGameStateBase* SevenGS = GetGameState<ASevenGameStateBase>();
+        if (SevenGS)
+        {
+            SevenGS->SetTotalZombies(SpawnCount);
+            SevenGS->SetRemainingZombies(SpawnCount);
+        }
+    }
 
     GetWorldTimerManager().ClearTimer(PhaseTimerHandle);
     GetWorldTimerManager().SetTimer(PhaseTimerHandle, this, &ASevenGameModeBase::UpdateTimer, 1.f, true);
@@ -198,3 +223,5 @@ void ASevenGameModeBase::ToggleDayNight()
 {
     // 필요 시 낮/밤 토글 기능 구현
 }
+
+

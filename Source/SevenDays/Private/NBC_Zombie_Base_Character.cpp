@@ -8,6 +8,10 @@
 #include "NBC_SpawnManager.h"
 #include "NBC_Zombie_AIController.h"
 #include "SevenGameStateBase.h"
+#include "SevenGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+
+
 
 
 // Sets default values
@@ -99,12 +103,36 @@ void ANBC_Zombie_Base_Character::Death()
 		GetMesh()->SetCollisionProfileName("Ragdoll");
 
 		//GetWorld()->GetGameState()->GetSpawnManager(this);
-		if(TestSpawnManager != nullptr)
+		if (TestSpawnManager != nullptr)
 			TestSpawnManager->SetEnemy(this);
 
 		if (ASevenGameStateBase* test = Cast< ASevenGameStateBase>(GetWorld()->GetGameState()))
 		{
 			//점수 추가시 코드 넣어 줄 곳.
+		}
+
+		// 좀비가 죽으면 스폰 매니저에 반환
+		if (TestSpawnManager)
+		{
+			TestSpawnManager->SetEnemy(this);
+		}
+
+		// 남은 좀비 수 업데이트
+		ASevenGameStateBase* SevenGS = Cast<ASevenGameStateBase>(UGameplayStatics::GetGameState(this));
+		if (SevenGS)
+		{
+			int32 NewRemainingZombies = SevenGS->GetRemainingZombies() - 1;
+			SevenGS->SetRemainingZombies(NewRemainingZombies);
+
+			if (NewRemainingZombies <= 0)
+			{
+				// 모든 좀비가 사망하면 웨이브 종료
+				ASevenGameModeBase* SevenGM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this));
+				if (SevenGM)
+				{
+					SevenGM->EndWave();
+				}
+			}
 		}
 	}
 }
