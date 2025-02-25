@@ -12,6 +12,7 @@ AMyPlayerController::AMyPlayerController()
 	JumpAction = nullptr;
 	SprintAction = nullptr;
 	CrouchAction = nullptr;
+	InteractAction = nullptr;
 
 }
 

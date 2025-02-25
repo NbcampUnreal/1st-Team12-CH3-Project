@@ -2,13 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interact.h"
 #include "PickUpWeapon.generated.h"
 
 class USphereComponent;
 
 UCLASS()
-class SEVENDAYS_API APickUpWeapon : public AActor, public IInteract
+class SEVENDAYS_API APickUpWeapon : public AActor
 {
 	GENERATED_BODY()
 	
@@ -26,6 +25,4 @@ public:
 	USphereComponent* SphereCollision;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	FDataTableRowHandle WeaponData;
-
-	virtual void PickUp(APlayerCharacter* PlayerCharacter) override;
 };

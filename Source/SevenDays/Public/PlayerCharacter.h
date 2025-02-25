@@ -11,8 +11,10 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UCharacterMovementComponent;
+class AEquipWeapon;
 
 struct FInputActionValue;
+struct FS_Weapon;
 
 UCLASS()
 class SEVENDAYS_API APlayerCharacter : public ACharacter
@@ -41,6 +43,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon")
+	AEquipWeapon* CurrentWeapon;
 
 protected:
 	UFUNCTION()
@@ -63,4 +67,6 @@ protected:
 	UFUNCTION()
 	void StopCrouch(const FInputActionValue& _Value);
 
+	UFUNCTION()
+	void Interact(const FInputActionValue& _Value);
 };

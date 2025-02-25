@@ -9,6 +9,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "MyPlayerController.h"
+#include "EquipWeapon.h"
+#include "PickUpWeapon.h"
+#include "Weapon.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -68,6 +71,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			{
 				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Triggered, this, &APlayerCharacter::StartCrouch);
 				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopCrouch);
+			}
+
+			if (PlayerController->InteractAction)
+			{
+				EnhancedInput->BindAction(PlayerController->InteractAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Interact);
 			}
 		}
 	}
@@ -146,4 +154,9 @@ void APlayerCharacter::StopCrouch(const FInputActionValue& _Value)
 	{
 		UnCrouch();
 	}
+}
+
+void APlayerCharacter::Interact(const FInputActionValue& _Value)
+{
+
 }

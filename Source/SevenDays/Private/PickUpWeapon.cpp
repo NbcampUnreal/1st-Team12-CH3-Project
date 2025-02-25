@@ -1,5 +1,8 @@
 #include "PickUpWeapon.h"
 #include "Components/SphereComponent.h"
+#include "Weapon.h"
+#include "PlayerCharacter.h"
+#include "EquipWeapon.h"
 
 APickUpWeapon::APickUpWeapon()
 {
@@ -11,7 +14,7 @@ APickUpWeapon::APickUpWeapon()
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	StaticMesh->SetCollisionObjectType(ECC_WorldDynamic);
 	StaticMesh->SetCollisionResponseToAllChannels(ECR_Block);
-	StaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Overlap);
+	StaticMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Ignore);
 
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SphereCollision->SetupAttachment(StaticMesh);
@@ -29,9 +32,3 @@ void APickUpWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-void APickUpWeapon::PickUp(APlayerCharacter* PlayerCharacter)
-{
-
-}
-
