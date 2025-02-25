@@ -35,10 +35,11 @@ protected:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	// 캐릭터 게임에서 보이게 할지 말지 정하는 코드
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
 public:	
+	//공격 받을 시 코드
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	//공격 범위 껏나 키기
@@ -48,7 +49,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ZombieAttackEnd();
 
-
+	// 좀비 죽음
 	void Death();
 
 protected:
@@ -61,6 +62,7 @@ protected:
 	virtual void CollisionOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit);
 
+	//스폰매니저 아직 없으므로 생성한 테스트 형 변수
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TEST")
 	ANBC_SpawnManager* TestSpawnManager;
 

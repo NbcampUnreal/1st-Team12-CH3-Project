@@ -13,11 +13,11 @@ UCLASS()
 class SEVENDAYS_API UNBC_ANS_ZomBie_Attack : public UAnimNotifyState
 {
 	GENERATED_BODY()
-	
+	//공격 범위 시작
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp,
 		UAnimSequenceBase* Animation,
 		float TotalDuration) override;
-
+	// 공격 범위 끝
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp,
 		UAnimSequenceBase* Animatation) override;
 

@@ -102,12 +102,11 @@ void ANBC_Zombie_Base_Character::Death()
 		if(TestSpawnManager != nullptr)
 			TestSpawnManager->SetEnemy(this);
 
-		if(ASevenGameStateBase* test = Cast< ASevenGameStateBase>(GetWorld()->GetGameState()))
-			test->AddScore(1);
-
-
+		if (ASevenGameStateBase* test = Cast< ASevenGameStateBase>(GetWorld()->GetGameState()))
+		{
+			//점수 추가시 코드 넣어 줄 곳.
+		}
 	}
-
 }
 
 void ANBC_Zombie_Base_Character::CollisionOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

@@ -5,11 +5,11 @@
 #include "ZombieBossAnimInstance.h"
 #include "NBC_Zombie_Boss_Character.h"
 
+//공격 히트박스 켜주기
 void UNBC_ANS_ZomBie_Attack::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (MeshComp)
 	{
-		//공격 감지 함수 생각할것 // 2025- 02 - 21
 		ANBC_Zombie_Base_Character* Zombie = Cast<ANBC_Zombie_Base_Character>(MeshComp->GetOwner());
 		if (Zombie)
 		{
@@ -24,12 +24,13 @@ void UNBC_ANS_ZomBie_Attack::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnim
 
 }
 
+//공격 히트 박스 꺼주기
+
 void UNBC_ANS_ZomBie_Attack::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animatation)
 {
 
 	if (MeshComp)
 	{
-		//공격 감지 함수 생각할것 // 2025- 02 - 21
 		ANBC_Zombie_Base_Character* Zombie = Cast<ANBC_Zombie_Base_Character>(MeshComp->GetOwner());
 		if (Zombie)
 		{

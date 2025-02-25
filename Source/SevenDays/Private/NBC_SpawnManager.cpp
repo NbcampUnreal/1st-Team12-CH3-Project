@@ -8,10 +8,7 @@ ANBC_SpawnManager::ANBC_SpawnManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
-
-
 
 // Called when the game starts or when spawned
 void ANBC_SpawnManager::BeginPlay()
@@ -28,6 +25,7 @@ void ANBC_SpawnManager::Tick(float DeltaTime)
 
 }
 
+// 좀비 생성 코드
 void ANBC_SpawnManager::GetEnemy()
 {
 	if (ZombiesRef.Num() == 0)
@@ -43,6 +41,7 @@ void ANBC_SpawnManager::GetEnemy()
 	}
 	else {
 
+		// 좀비 스폰 타입
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -55,9 +54,10 @@ void ANBC_SpawnManager::GetEnemy()
 			UE_LOG(LogTemp, Log, TEXT("%d"), index);
 		}
 		else {
-			index = FMath::RandRange(0, ZombiesRef.Num() - 1); // 보스는 나오지 않도록
+			index = 0; // 보스는 나오지 않도록
 		}
 
+		//소환 코드
 		AActor* ResultPawn = GetWorld()->SpawnActor<AActor>(ZombiesRef[index],
 			GetActorLocation(),
 			FRotator::ZeroRotator,
@@ -65,6 +65,7 @@ void ANBC_SpawnManager::GetEnemy()
 	}
 }
 
+// 좀비 배열 받기
 void ANBC_SpawnManager::SetEnemy(AActor* zombie)
 {
 	//콜리전 꺼주고 액터 이미지 꺼주기
@@ -79,6 +80,7 @@ void ANBC_SpawnManager::SetEnemy(AActor* zombie)
 	zombie->SetActorHiddenInGame(true);
 }
 
+// ---------- 좀비 생성 코드 -----------------
 void ANBC_SpawnManager::CreateZombie(int32 count)
 {
 	for (int32 i = 0; i < count; i++)

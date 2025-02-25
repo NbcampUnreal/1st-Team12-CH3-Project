@@ -26,10 +26,10 @@ protected:
 
 	virtual void BeginPlay() override;
 
-
+	//애니메이션 인스턴스 (보스용)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ANIM")
 	UZombieBossAnimInstance* AnimInstance;
-
+	// 점프 공격 용 히트 박스
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ANIM")
 	UBoxComponent* JumpAttackCollision;
 
@@ -38,10 +38,10 @@ protected:
 	void ActivePattern(int32 patternNumber);	
 
 	
-
+	// 점프 공격
 	UFUNCTION(BlueprintCallable)
 	void JumpAttackPattern();
-
+	// 침 발사
 	UFUNCTION(BlueprintCallable)
 	void BreathPattern();
 

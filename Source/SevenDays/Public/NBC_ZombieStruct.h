@@ -12,28 +12,33 @@ USTRUCT(BlueprintType)
 struct FNBC_ZombieStruct
 {
 	GENERATED_BODY()
-
+	// 현재 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CurrentHp;
+	// 최대 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxHp;
 
+	// 일반 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float NormalSpeed;
+
+	//달리기 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float BoostSpeed;
 	
-
+	// 데미지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Damage;
 
+	// 생성자
 	FNBC_ZombieStruct()
 		: CurrentHp(100), MaxHp(100), NormalSpeed(200.f), BoostSpeed(240.f), Damage(10) 
 	{
 	}
 
 
-
+	// 설정 생성자
 	FNBC_ZombieStruct(int32 Hp, float Speed, int32 damage) : 
 		MaxHp(Hp) , 
 		NormalSpeed(Speed),

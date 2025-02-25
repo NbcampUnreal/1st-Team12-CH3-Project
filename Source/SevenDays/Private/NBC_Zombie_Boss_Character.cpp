@@ -29,17 +29,11 @@ void ANBC_Zombie_Boss_Character::PostInitializeComponents()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Not cast boss zombie anim"));
 		}
-
-		
-
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No have boss zombie anim"));
-
 	}
-
-
 }
 
 void ANBC_Zombie_Boss_Character::BeginPlay()
@@ -47,8 +41,11 @@ void ANBC_Zombie_Boss_Character::BeginPlay()
 	Super::BeginPlay();
 }
 
+// --------------- 좀비 패턴 -----------------------------
 void ANBC_Zombie_Boss_Character::ActivePattern(int32 patternNumber)
 {
+	//애니메이션 인스턴스확인 후 패턴 설정 
+	//해당 코드는  BT에서 불려집니다.
 	if (AnimInstance)
 		AnimInstance->ActivePattern(patternNumber);
 	else {

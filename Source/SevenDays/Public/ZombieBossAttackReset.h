@@ -15,6 +15,7 @@ class SEVENDAYS_API UZombieBossAttackReset : public UAnimNotify
 	GENERATED_BODY()
 	
 public:
+	//좀비 공격 히트 박스 꺼주기
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 	
 
