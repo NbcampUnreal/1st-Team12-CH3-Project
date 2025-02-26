@@ -69,6 +69,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Triggered, this, &APlayerCharacter::StartCrouch);
 				EnhancedInput->BindAction(PlayerController->CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopCrouch);
 			}
+
+			if (PlayerController->FireAction)
+			{
+				EnhancedInput->BindAction(PlayerController->FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Fire);
+			}
+
+			if (PlayerController->ReloadAction)
+			{
+				EnhancedInput->BindAction(PlayerController->ReloadAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Reload);
+			}
 		}
 	}
 }
@@ -146,4 +156,39 @@ void APlayerCharacter::StopCrouch(const FInputActionValue& _Value)
 	{
 		UnCrouch();
 	}
+}
+
+void APlayerCharacter::Fire(const FInputActionValue& _Value)
+{
+	if (_Value.Get<bool>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fire"));
+	}
+}
+
+void APlayerCharacter::Reload(const FInputActionValue& _Value)
+{
+	if (_Value.Get<bool>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Reload"));
+	}
+}
+
+void APlayerCharacter::OnDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnDeath"));
+}
+
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+
+	if (Health <= 0.0f)
+	{
+		OnDeath();
+	}
+
+	return ActualDamage;
 }

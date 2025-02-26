@@ -12,7 +12,7 @@ AMyPlayerController::AMyPlayerController()
 	JumpAction = nullptr;
 	SprintAction = nullptr;
 	CrouchAction = nullptr;
-
+	FireAction = nullptr;
 }
 
 void AMyPlayerController::BeginPlay()

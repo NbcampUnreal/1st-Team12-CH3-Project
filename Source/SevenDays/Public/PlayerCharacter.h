@@ -41,6 +41,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	float Health = 100.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	float MaxHealth = 100.0f;
 
 protected:
 	UFUNCTION()
@@ -62,5 +67,16 @@ protected:
 	void StartCrouch(const FInputActionValue& _Value);
 	UFUNCTION()
 	void StopCrouch(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void Fire(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void Reload(const FInputActionValue& _Value);
+
+
+
+	void OnDeath();
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 };
