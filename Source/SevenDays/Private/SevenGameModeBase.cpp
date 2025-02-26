@@ -60,8 +60,10 @@ void ASevenGameModeBase::StartWave()
     // 좀비 생성
     if (SpawnManager)
     {
-        int32 SpawnCount = CurrentWave * 5; // 예제: 웨이브마다 5마리씩 증가
-        SpawnManager->CreateZombie(SpawnCount, FVector::ZeroVector);
+
+        int32 SpawnCount = CurrentWave * 5; // 웨이브마다 5마리씩 증가
+        FVector SpawnLocation = FVector(0.0f, 0.0f, 100.0f); // 스폰할 위치 지정
+        SpawnManager->CreateZombie(SpawnCount, SpawnLocation);
 
         ASevenGameStateBase* SevenGS = GetGameState<ASevenGameStateBase>();
         if (SevenGS)
