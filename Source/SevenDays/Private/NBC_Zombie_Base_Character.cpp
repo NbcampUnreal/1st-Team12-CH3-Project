@@ -54,16 +54,24 @@ void ANBC_Zombie_Base_Character::SetActorHiddenInGame(bool bNewHidden)
 {
 	Super::SetActorHiddenInGame(bNewHidden);
 
-	//투명해제하는순간콜리전 켜주기
+	//투명해제하는순간
 	if (!bNewHidden)
 	{
 		SetActorEnableCollision(true);
+		ZombieStat.CurrentHp = ZombieStat.MaxHp;
 	}
 }
 
 float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	//피격시 스피드를 느리게 해주기 //
+	ZombieStat.CurrentHp -= DamageAmount;
+
+	if (ZombieStat.CurrentHp <= 0)
+	{
+		Death();
+	}
+
 	return 0.0f;
 }
 

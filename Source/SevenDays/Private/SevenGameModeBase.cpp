@@ -61,7 +61,7 @@ void ASevenGameModeBase::StartWave()
     if (SpawnManager)
     {
         int32 SpawnCount = CurrentWave * 5; // 예제: 웨이브마다 5마리씩 증가
-        SpawnManager->CreateZombie(SpawnCount);
+        SpawnManager->CreateZombie(SpawnCount, FVector::ZeroVector);
 
         ASevenGameStateBase* SevenGS = GetGameState<ASevenGameStateBase>();
         if (SevenGS)

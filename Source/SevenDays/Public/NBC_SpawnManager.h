@@ -42,7 +42,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZOMBIE")
 	TArray<TSubclassOf<ANBC_Zombie_Base_Character>> ZombiesRef;
 	
-	//좀비가 담길 공간
+	//aactor타입의 액터를 가리키는 소프트 래퍼런스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZOMBIE")
+	TSoftClassPtr<ACharacter> ZombieRefClass;
+
+	//해당 타입의 클래스를 가리킴
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZOMBIE")
+	TSoftClassPtr<AActor> DataRefClass;
+
+	//-------------------- 비동기로 불러온 클래스 저장용!!!---------------------
+	//  로드된 클래스 저장 (필요할 때 스폰하기 위해)
+	UClass* LoadedZombieClass;
+
+	// 비동기 로드 클래스 
+	void LoadClass(TSoftClassPtr<ACharacter> Ref);
+
+	//동기식 로드
+	void LoadClassSynchronously(TSoftClassPtr<ACharacter> Ref);
+
+	//----------------좀비가 담길 공간 ----------------------
 	TArray<AActor*> ZombieArr;
 
 	TArray<AActor*> BossZombie;

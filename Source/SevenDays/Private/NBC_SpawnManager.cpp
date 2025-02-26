@@ -2,12 +2,28 @@
 
 
 #include "NBC_SpawnManager.h"
+#include "Engine/StreamableManager.h"
+#include "Engine/AssetManager.h"
 
 // Sets default values
 ANBC_SpawnManager::ANBC_SpawnManager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Soft reference를 통해 클래스 경로 지정
+	ZombieRefClass = TSoftClassPtr<ACharacter>(FSoftClassPath("/Game/Zombie/BP/BP_NBC_Zombie_Base_Character.BP_NBC_Zombie_Base_Character_C"));
+
+
+	// 클래스를 동기적으로 로드해서 검증
+	if (ZombieRefClass.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Successfully loaded class!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Failed to load class."));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -15,8 +31,9 @@ void ANBC_SpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CreateZombie(10,GetActorLocation());
 
+	LoadClass(ZombieRefClass);
+	LoadClassSynchronously(ZombieRefClass);
 }
 
 // Called every frame
@@ -26,12 +43,55 @@ void ANBC_SpawnManager::Tick(float DeltaTime)
 
 }
 
+void ANBC_SpawnManager::LoadClass(TSoftClassPtr<ACharacter> Ref)
+{
+	// 비동기 매니저 가져와서 사용
+	FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
+	Streamable.RequestAsyncLoad(Ref.ToSoftObjectPath(), [this, Ref]()
+		{
+			// 비동기 로드 완료 후
+			if (Ref.IsValid())
+			{
+				//로드된 클래스 
+				LoadedZombieClass = Ref.Get();
+				UE_LOG(LogTemp, Log, TEXT("succesed!"));
+
+				//좀비 생성
+				CreateZombie(10, GetActorLocation());
+
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("fail!"));
+
+			}
+		});
+}
+
+void ANBC_SpawnManager::LoadClassSynchronously(TSoftClassPtr<ACharacter> Ref)
+{
+	if (Ref.IsValid())
+	{
+		LoadedZombieClass = Ref.LoadSynchronous();
+		if (LoadedZombieClass)
+		{
+			CreateZombie(10, GetActorLocation());
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load class synchronously!"));
+		}
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Invalid class reference."));
+	}
+}
+
 // 좀비 생성 코드
 AActor* ANBC_SpawnManager::GetEnemy(const FVector SpawnPoint)
 {
 	AActor* ResultPawn = nullptr;
 
-	if (ZombiesRef.Num() == 0)
+	//로드도니 코드 클래스 유효 확인
+	if (ZombiesRef.Num() == 0 || LoadedZombieClass == nullptr)
 		return nullptr;
 
 	if (!ZombieArr.IsEmpty())
@@ -61,7 +121,7 @@ AActor* ANBC_SpawnManager::GetEnemy(const FVector SpawnPoint)
 		}
 
 		//소환 코드
-		ResultPawn = GetWorld()->SpawnActor<AActor>(ZombiesRef[index],
+		ResultPawn = GetWorld()->SpawnActor<AActor>(LoadedZombieClass,
 			SpawnPoint,
 			FRotator::ZeroRotator,
 			SpawnParams);
