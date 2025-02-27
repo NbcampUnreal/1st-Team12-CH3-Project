@@ -25,6 +25,7 @@ APlayerCharacter::APlayerCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
+	CameraComponent->bUsePawnControlRotation = false;
 
 	FPSMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPSMeshComponent"));
 	FPSMeshComponent->SetupAttachment(SpringArmComponent);
@@ -32,14 +33,18 @@ APlayerCharacter::APlayerCharacter()
 	FPSMeshComponent->bCastDynamicShadow = false;
 	FPSMeshComponent->bCastStaticShadow = false;
 
-	ChangeWeaponARDelegate.BindUFunction(this, FName("CompleteChangeWeapon"), ECurrentWeaponType::AR);
-	ChangeWeaponHGDelegate.BindUFunction(this, FName("CompleteChangeWeapon"), ECurrentWeaponType::HG);
-	ChangeWeaponGLDelegate.BindUFunction(this, FName("CompleteChangeWeapon"), ECurrentWeaponType::GL);
 	
 	Current_reloadTime = AR_ReloadTime;
 	Current_fireRate = AR_FireRate;
 	Current_currentBullet = AR_CurrentBullet;
 	Current_maxBullet = AR_MaxBullet;
+}
+
+void APlayerCharacter::BeginPlay()
+{
+	ChangeWeaponARDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::AR); });
+	ChangeWeaponHGDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::HG); });
+	ChangeWeaponGLDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::GL); });
 }
 
 
@@ -142,6 +147,7 @@ void APlayerCharacter::Look(const FInputActionValue& _Value)
 
 	AddControllerYawInput(LookInput.X);
 	AddControllerPitchInput(LookInput.Y);
+	UE_LOG(LogTemp, Warning, TEXT("LookInput : %s"), *LookInput.ToString());
 }
 
 void APlayerCharacter::StartJump(const FInputActionValue& _Value)
