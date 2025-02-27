@@ -48,6 +48,19 @@ public:
 	float MaxHealth = 100.0f;
 
 protected:
+	//테스트용
+	//TODO: 나중에 불필요시 제거
+	// 추후에 무기 클래스 내의 변수를 이용하기
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Status")
+	bool bIsReloading = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Status")
+	bool bIsChangingWeapon = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Status")
+	bool bIsBulletEmpty = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Status")
+	bool bIsFiring = false;
+
+
 	UFUNCTION()
 	void Move(const FInputActionValue& _Value);
 	UFUNCTION()
@@ -74,6 +87,20 @@ protected:
 	UFUNCTION()
 	void Reload(const FInputActionValue& _Value);
 
+	UFUNCTION()
+	void ChangeToAR(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void ChangeToHG(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void ChangeToGL(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void WheelUp(const FInputActionValue& _Value);
+
+	UFUNCTION()
+	void WheelDown(const FInputActionValue& _Value);
 
 
 	void OnDeath();

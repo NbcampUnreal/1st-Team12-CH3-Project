@@ -79,6 +79,31 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			{
 				EnhancedInput->BindAction(PlayerController->ReloadAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Reload);
 			}
+
+			if (PlayerController->ChangeARAction)
+			{
+				EnhancedInput->BindAction(PlayerController->ChangeARAction, ETriggerEvent::Triggered, this, &APlayerCharacter::ChangeToAR);
+			}
+
+			if (PlayerController->ChangeHGAction)
+			{
+				EnhancedInput->BindAction(PlayerController->ChangeHGAction, ETriggerEvent::Triggered, this, &APlayerCharacter::ChangeToHG);
+			}
+
+			if (PlayerController->ChangeGLAction)
+			{
+				EnhancedInput->BindAction(PlayerController->ChangeGLAction, ETriggerEvent::Triggered, this, &APlayerCharacter::ChangeToGL);
+			}
+
+			if (PlayerController->WheelUpAction)
+			{
+				EnhancedInput->BindAction(PlayerController->WheelUpAction, ETriggerEvent::Triggered, this, &APlayerCharacter::WheelUp);
+			}
+
+			if (PlayerController->WheelDownAction)
+			{
+				EnhancedInput->BindAction(PlayerController->WheelDownAction, ETriggerEvent::Triggered, this, &APlayerCharacter::WheelDown);
+			}
 		}
 	}
 }
@@ -171,6 +196,46 @@ void APlayerCharacter::Reload(const FInputActionValue& _Value)
 	if (_Value.Get<bool>())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Reload"));
+	}
+}
+
+void APlayerCharacter::ChangeToAR(const FInputActionValue& _Value)
+{
+	if (_Value.Get<bool>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ChangeToAR"));
+	}
+}
+
+void APlayerCharacter::ChangeToHG(const FInputActionValue& _Value)
+{
+	if (_Value.Get<bool>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ChangeToHG"));
+	}
+}
+
+void APlayerCharacter::ChangeToGL(const FInputActionValue& _Value)
+{
+	if (_Value.Get<bool>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ChangeToGL"));
+	}
+}
+
+void APlayerCharacter::WheelUp(const FInputActionValue& _Value)
+{
+	if (_Value.Get<bool>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WheelUp"));
+	}
+}
+
+void APlayerCharacter::WheelDown(const FInputActionValue& _Value)
+{
+	if (_Value.Get<bool>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WheelDown"));
 	}
 }
 
