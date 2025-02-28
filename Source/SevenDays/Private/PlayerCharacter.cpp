@@ -42,6 +42,8 @@ APlayerCharacter::APlayerCharacter()
 
 void APlayerCharacter::BeginPlay()
 {
+	Super::BeginPlay();
+
 	ChangeWeaponARDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::AR); });
 	ChangeWeaponHGDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::HG); });
 	ChangeWeaponGLDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::GL); });
