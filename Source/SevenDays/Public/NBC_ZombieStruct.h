@@ -12,6 +12,8 @@ USTRUCT(BlueprintType)
 struct FNBC_ZombieStruct
 {
 	GENERATED_BODY()
+
+
 	// 현재 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CurrentHp;

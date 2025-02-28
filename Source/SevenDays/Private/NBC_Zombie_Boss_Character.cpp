@@ -3,16 +3,15 @@
 
 #include "NBC_Zombie_Boss_Character.h"
 #include "Components/BoxComponent.h"
-
+#include "Components/ArrowComponent.h"
 
 ANBC_Zombie_Boss_Character::ANBC_Zombie_Boss_Character()
 {
-
-	JumpAttackCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("JumpBoxCollision"));
-	JumpAttackCollision->SetupAttachment(GetMesh());
-	JumpAttackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	JumpAttackCollision->OnComponentHit.AddDynamic(this, &ANBC_Zombie_Boss_Character::CollisionOnHit);
+	if (USkeletalMeshComponent* skel = GetMesh())
+	{
+		SpitPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("Spit_Point"));
+		SpitPoint->SetupAttachment(skel);
+	}
 }
 
 void ANBC_Zombie_Boss_Character::PostInitializeComponents()
@@ -53,14 +52,18 @@ void ANBC_Zombie_Boss_Character::ActivePattern(int32 patternNumber)
 	}
 }
 
-
-void ANBC_Zombie_Boss_Character::JumpAttackPattern()
-{
-	JumpAttackCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-
+void ANBC_Zombie_Boss_Character::ZombieAttack()
+{	
+	Super::ZombieAttack();
 }
+
+
+
 
 void ANBC_Zombie_Boss_Character::BreathPattern()
 {
 	
 }
+
+
+
