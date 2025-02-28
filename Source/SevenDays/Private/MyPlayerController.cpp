@@ -13,6 +13,12 @@ AMyPlayerController::AMyPlayerController()
 	SprintAction = nullptr;
 	CrouchAction = nullptr;
 	FireAction = nullptr;
+	ReloadAction = nullptr;
+	ChangeARAction = nullptr;
+	ChangeHGAction = nullptr;
+	ChangeGLAction = nullptr;
+	WheelUpAction = nullptr;
+	WheelDownAction = nullptr;
 }
 
 void AMyPlayerController::BeginPlay()
