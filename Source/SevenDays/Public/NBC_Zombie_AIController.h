@@ -14,4 +14,15 @@ class SEVENDAYS_API ANBC_Zombie_AIController : public AAIController
 {
 	GENERATED_BODY()
 	
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void StartGame();
+
+protected:
+	
+	// 게임 시작
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Value")
+	bool bIsStart;
+
 };

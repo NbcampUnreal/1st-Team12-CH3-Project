@@ -45,9 +45,8 @@ public:
 	//공격 범위 껏나 키기
 	UFUNCTION(BlueprintCallable)
 	virtual void ZombieAttack();
-	// 공격 범위 끄기
-	UFUNCTION(BlueprintCallable)
-	virtual void ZombieAttackEnd();
+
+	
 
 	// 좀비 죽음
 	void Death();
@@ -56,15 +55,6 @@ protected:
 	//좀비스텟
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FNBC_ZombieStruct ZombieStat;
-
-	//콜리전함수용
-	UFUNCTION()
-	virtual void CollisionOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-		FVector NormalImpulse, const FHitResult& Hit);
-
-	//스폰매니저 아직 없으므로 생성한 테스트 형 변수
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TEST")
-	ANBC_SpawnManager* TestSpawnManager;
 
 
 };
