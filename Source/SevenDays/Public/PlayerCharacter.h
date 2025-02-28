@@ -105,6 +105,7 @@ protected:
 	int32 Current_currentBullet = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
 	int32 Current_maxBullet = 0;
+	//테스트용 끝
 
 	UFUNCTION()
 	void Move(const FInputActionValue& _Value);

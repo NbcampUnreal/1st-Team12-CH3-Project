@@ -149,7 +149,6 @@ void APlayerCharacter::Look(const FInputActionValue& _Value)
 
 	AddControllerYawInput(LookInput.X);
 	AddControllerPitchInput(LookInput.Y);
-	UE_LOG(LogTemp, Warning, TEXT("LookInput : %s"), *LookInput.ToString());
 }
 
 void APlayerCharacter::StartJump(const FInputActionValue& _Value)
@@ -320,7 +319,6 @@ void APlayerCharacter::WheelUp(const FInputActionValue& _Value)
 {
 	if (_Value.Get<bool>()) // 어케 만들지 고민중
 	{
-		bIsChangingWeapon = true;
 		UE_LOG(LogTemp, Warning, TEXT("WheelUp"));
 	}
 }
@@ -329,7 +327,6 @@ void APlayerCharacter::WheelDown(const FInputActionValue& _Value)
 {
 	if (_Value.Get<bool>()) // 어케 만들지 고민중
 	{
-		bIsChangingWeapon = true;
 		UE_LOG(LogTemp, Warning, TEXT("WheelDown"));
 	}
 }
