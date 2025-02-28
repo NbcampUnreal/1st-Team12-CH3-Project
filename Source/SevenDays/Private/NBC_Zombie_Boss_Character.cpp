@@ -10,7 +10,7 @@ ANBC_Zombie_Boss_Character::ANBC_Zombie_Boss_Character()
 	if (USkeletalMeshComponent* skel = GetMesh())
 	{
 		SpitPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("Spit_Point"));
-		SpitPoint->SetupAttachment(skel);
+		SpitPoint->SetupAttachment(skel, TEXT("Head"));
 	}
 }
 
