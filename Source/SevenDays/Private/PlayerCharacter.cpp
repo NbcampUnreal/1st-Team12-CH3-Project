@@ -391,7 +391,7 @@ void APlayerCharacter::CompleteReloading()
 	GetWorldTimerManager().ClearTimer(ReloadTimerHandle);
 	bIsReloading = false;
 	bIsBulletEmpty = false;
-	AR_CurrentBullet = AR_MaxBullet;
+	Current_currentBullet = Current_maxBullet;
 }
 
 void APlayerCharacter::CompleteChangeWeapon(ECurrentWeaponType _EType)
