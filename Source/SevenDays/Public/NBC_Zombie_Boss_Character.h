@@ -28,17 +28,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "COMPONENT")
 	UArrowComponent* SpitPoint;
-	
-
-	//실질적으로 불려질 패턴 // 델리게이트처럼 함수를 저장 하는게 있다면 좋을것 같다.
-	UFUNCTION(BlueprintCallable)
-	void ActivePattern(int32 patternNumber);	
 
 	virtual void ZombieAttack() override;
-
-	// 침 발사
-	UFUNCTION(BlueprintCallable)
-	void BreathPattern();
 
 
 

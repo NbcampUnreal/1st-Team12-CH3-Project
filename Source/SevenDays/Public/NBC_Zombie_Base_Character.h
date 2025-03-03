@@ -23,7 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* HeadCollision;
 
-	//공격 범위
+	//몸통 범위
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* HitCollision;
 
@@ -42,11 +42,9 @@ public:
 	//공격 받을 시 코드
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	//공격 범위 껏나 키기
+	//공격 라인트레이스 사용
 	UFUNCTION(BlueprintCallable)
 	virtual void ZombieAttack();
-
-	
 
 	// 좀비 죽음
 	void Death();
@@ -56,5 +54,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FNBC_ZombieStruct ZombieStat;
 
+private:
+	float MaxWalkSpeed;
+
+	FTimerHandle SlowDelayTimer;
+
+	void MoveSpeedReset();
 
 };

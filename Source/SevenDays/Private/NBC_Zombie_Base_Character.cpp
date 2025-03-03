@@ -10,6 +10,7 @@
 #include "SevenGameStateBase.h"
 #include "SevenGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 
@@ -27,6 +28,8 @@ ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character():
 		HeadCollision->SetupAttachment(MeshComp, TEXT("Head"));			
 	}
 
+
+	MaxWalkSpeed = 600.0f;
 }
 
 // Called when the game starts or when spawned
@@ -61,7 +64,23 @@ void ANBC_Zombie_Base_Character::SetActorHiddenInGame(bool bNewHidden)
 float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	//피격시 스피드를 느리게 해주기 //
+	
 	ZombieStat.CurrentHp -= DamageAmount;
+
+	if (GetWorldTimerManager().IsTimerActive(SlowDelayTimer))
+	{
+		//실행중
+	}
+	else {
+		GetWorldTimerManager().SetTimer(SlowDelayTimer, this, &ANBC_Zombie_Base_Character::MoveSpeedReset, 1.5f, false);
+	}
+
+	if (UCharacterMovementComponent* movement =
+		GetCharacterMovement())
+	{
+		movement->MaxWalkSpeed = FMath::Clamp(movement->MaxWalkSpeed * 0.5f,
+			0, 600.0f);
+	}
 
 	if (ZombieStat.CurrentHp <= 0)
 	{
@@ -99,7 +118,6 @@ void ANBC_Zombie_Base_Character::ZombieAttack()
 			UE_LOG(LogTemp, Warning, TEXT("Hit Actor : %s"), *HitActor->GetName());
 		}
 	}
-
 }
 
 
@@ -139,6 +157,12 @@ void ANBC_Zombie_Base_Character::Death()
 			}
 		}
 	}
+}
+
+void ANBC_Zombie_Base_Character::MoveSpeedReset()
+{
+	//속도 원상복귀
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 }
 
 

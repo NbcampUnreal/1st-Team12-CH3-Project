@@ -15,21 +15,21 @@ public:
 	ANBC_SpawnManager();
 
 	//좀비 배열에서 꺼내서 주기
-	void GetEnemy(const FVector SpawnPoint);
+	void SummonEnemy(const FVector SpawnPoint);
 
-	//좀비 배열에 넣기
-	UFUNCTION()
-	void SetEnemy(AActor* zombie);
+	////좀비 배열에 넣기
+	//UFUNCTION()
+	//void SetEnemy(AActor* zombie);
 
 	//좀비 생성하기
 	UFUNCTION(BlueprintCallable)
 	void CreateZombie(int32 count, const FVector SpawnPoint);
 
 	//좀비 전부 죽이거나 지우기
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ClearZombie();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void CreateBoss(const FVector SpawnPoint);
 
 
@@ -56,10 +56,7 @@ protected:
 	//----------------좀비가 담길 공간 ----------------------
 	//좀비들은 구별할 필요없을 것 같아서 이렇게 사용함.
 	UPROPERTY()
-	TArray<TWeakObjectPtr<AActor>> ZombieArr;
-
-	UPROPERTY()
-	TArray<AActor*> BossZombie;
+	TArray<AActor*> ZombieArr;
 
 	//좀비 최대수
 	int32 MaxZombieInex;
