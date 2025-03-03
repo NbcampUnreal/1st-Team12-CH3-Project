@@ -12,27 +12,23 @@ class SEVENDAYS_API ASevenGameStateBase : public AGameStateBase
 public:
     ASevenGameStateBase();
 
-protected:
-    // 남은 좀비 수
-    UPROPERTY(Transient, BlueprintReadOnly, Category = "Wave")
-    int32 RemainingZombies;
-
-    // 전체 좀비 수 (Wave 시작 시 스폰된 좀비 수)
-    UPROPERTY(Transient, BlueprintReadOnly, Category = "Wave")
+    /** 총 좀비 수 */
+    UPROPERTY(BlueprintReadOnly, Category = "Zombie")
     int32 TotalZombies;
 
-public:
-    // 남은 좀비 수 설정
-    UFUNCTION(BlueprintCallable, Category = "Wave")
-    void SetRemainingZombies(int32 NewValue);
+    /** 현재 남아있는 좀비 수 */
+    UPROPERTY(BlueprintReadOnly, Category = "Zombie")
+    int32 RemainingZombies;
 
-    UFUNCTION(BlueprintCallable, Category = "Wave")
+    UFUNCTION(BlueprintCallable, Category = "Zombie")
     int32 GetRemainingZombies() const { return RemainingZombies; }
 
-    // 전체 좀비 수 설정
-    UFUNCTION(BlueprintCallable, Category = "Wave")
-    void SetTotalZombies(int32 NewValue);
+    UFUNCTION()
+    void ReduceZombieCount();
 
-    UFUNCTION(BlueprintCallable, Category = "Wave")
-    int32 GetTotalZombies() const { return TotalZombies; }
+
+    /** 좀비 개수 설정 */
+    void SetTotalZombies(int32 Count);
+    void SetRemainingZombies(int32 Count);
+    void DecreaseRemainingZombie();
 };

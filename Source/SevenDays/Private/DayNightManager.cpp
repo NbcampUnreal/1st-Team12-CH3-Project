@@ -7,20 +7,14 @@
 #include "Misc/OutputDeviceNull.h"
 #include "EngineUtils.h"
 
+/** 생성자 */
 ADayNightManager::ADayNightManager()
 {
     PrimaryActorTick.bCanEverTick = false;
     CurrentState = EDayNightState::Day;
-    // 낮 상태의 SunHeight는 BP_Sky_Sphere 기준 0.6, 밤은 -1
-    CurrentSunHeight = 0.6f;
-    TargetSunHeight = -1.f;
-    SunHeightInterpSpeed = 0.01f;  // 기존 변수, 사용 안할 수도 있음
-    bIsDaytime = true; // 기본은 낮
-
-    TransitionElapsedTime = 0.f;
-    TransitionTotalTime = 1.f; // 초기값, 실제 전환 시 DayDuration으로 설정
 }
 
+/** 게임 시작 시 초기화 */
 void ADayNightManager::BeginPlay()
 {
     Super::BeginPlay();
@@ -28,7 +22,7 @@ void ADayNightManager::BeginPlay()
     UWorld* World = GetWorld();
     if (!World)
     {
-        UE_LOG(LogTemp, Error, TEXT("World is NULL! Lighting setup failed."));
+        UE_LOG(LogTemp, Error, TEXT("[DayNightManager] World is NULL! Lighting setup failed."));
         return;
     }
 
@@ -36,6 +30,7 @@ void ADayNightManager::BeginPlay()
     for (TActorIterator<ADirectionalLight> It(World); It; ++It)
     {
         DirectionalLightActor = *It;
+        UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] DirectionalLight found: %s"), *DirectionalLightActor->GetName());
         break;
     }
 
@@ -43,145 +38,103 @@ void ADayNightManager::BeginPlay()
     for (TActorIterator<ASkyLight> It(World); It; ++It)
     {
         SkyLightActor = *It;
+        UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] SkyLight found: %s"), *SkyLightActor->GetName());
         break;
     }
 
-
-
-    // "BP_Sky_Sphere" 태그가 붙은 액터 찾기
-    TArray<AActor*> FoundActors;
-    UGameplayStatics::GetAllActorsWithTag(World, FName("BP_Sky_Sphere"), FoundActors);
-
-    if (FoundActors.Num() > 0)
+    // BP_Sky_Sphere 찾기 (태그 기반)
+    for (TActorIterator<AActor> It(World, AActor::StaticClass()); It; ++It)
     {
-        SkySphere = FoundActors[0];
-        UE_LOG(LogTemp, Warning, TEXT("BP_Sky_Sphere found: %s"), *SkySphere->GetName());
+        if (It->ActorHasTag(FName("BP_Sky_Sphere"))) // BP_Sky_Sphere에 "BP_Sky_Sphere" 태그 추가 필요
+        {
+            BP_Sky_Sphere = *It;
+            UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] BP_Sky_Sphere found: %s"), *BP_Sky_Sphere->GetName());
+            break;
+        }
     }
-    else
+
+    // BP_Sky_Sphere가 NULL이면 강제로 찾기
+    if (!BP_Sky_Sphere)
     {
-        UE_LOG(LogTemp, Error, TEXT("No BP_Sky_Sphere found in the scene!"));
+        BP_Sky_Sphere = UGameplayStatics::GetActorOfClass(GetWorld(), AActor::StaticClass());
+        if (BP_Sky_Sphere)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] Found BP_Sky_Sphere using GetActorOfClass."));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("[DayNightManager] BP_Sky_Sphere NOT found! Check if it's placed in the level."));
+        }
     }
 }
 
-
-void ADayNightManager::SetSunHeight(float NewSunHeight)
-{
-    CurrentSunHeight = NewSunHeight;
-    if (!SkySphere)
-    {
-        UE_LOG(LogTemp, Error, TEXT("SkySphere is NULL! Cannot update SunHeight."));
-        return;
-    }
-
-    FOutputDeviceNull OutputDevice;
-    FString Command = FString::Printf(TEXT("SetSunHeight %f"), NewSunHeight);
-    SkySphere->CallFunctionByNameWithArguments(*Command, OutputDevice, nullptr, true);
-
-    // SkySphere 머티리얼 업데이트
-    SkySphere->CallFunctionByNameWithArguments(TEXT("UpdateMaterial"), OutputDevice, nullptr, true);
-
-    // SkyLight 업데이트
-    if (SkyLightActor && SkyLightActor->GetLightComponent())
-    {
-        SkyLightActor->GetLightComponent()->MarkRenderStateDirty();
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT("SkySphere SunHeight updated to: %f"), NewSunHeight);
-}
-
-
-void ADayNightManager::SetDayNightState(EDayNightState NewState, float DayDuration)
+/** 낮/밤 상태 변경 */
+void ADayNightManager::SetDayNightState(EDayNightState NewState)
 {
     CurrentState = NewState;
-    UpdateLighting(); // 방향성 조명 업데이트
+    UpdateLighting();   // 조명 업데이트
+    UpdateSkySphere();  // BP_Sky_Sphere 업데이트
 
-    if (NewState == EDayNightState::Day)
-    {
-        // 낮일 때: 태양 높이를 0.6에서 -1.0로 서서히 변화
-        CurrentSunHeight = 0.6f;
-        TargetSunHeight = -1.0f;
-        SunHeightInterpSpeed = 0.8f / DayDuration;
-
-        GetWorldTimerManager().SetTimer(SmoothTransitionHandle, this, &ADayNightManager::SmoothTransitionSunHeight, 0.1f, true);
-    }
-    else
-    {
-        // 타이머 중지 후 즉시 밤 상태 적용
-        GetWorldTimerManager().ClearTimer(SmoothTransitionHandle);
-        SetSunHeight(-1.0f);
-    }
-
-    //  SkySphere 머티리얼 강제 업데이트
-    if (SkySphere)
-    {
-        FOutputDeviceNull OutputDevice;
-        SkySphere->CallFunctionByNameWithArguments(TEXT("UpdateMaterial"), OutputDevice, nullptr, true);
-    }
-
-    //  SkyLight 업데이트 (조명 반영)
-    if (SkyLightActor && SkyLightActor->GetLightComponent())
-    {
-        SkyLightActor->GetLightComponent()->MarkRenderStateDirty();
-    }
+    UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] DayNight state changed: %s"),
+        (NewState == EDayNightState::Day) ? TEXT("Day") : TEXT("Night"));
 }
 
-
+/** 조명 업데이트 */
 void ADayNightManager::UpdateLighting()
 {
-    if (CurrentState == EDayNightState::Day)
+    if (DirectionalLightActor && DirectionalLightActor->GetLightComponent())
     {
-        if (DirectionalLightActor)
+        if (CurrentState == EDayNightState::Day)
         {
             DirectionalLightActor->SetActorRotation(FRotator(-45.f, 0.f, 0.f));
+            DirectionalLightActor->GetLightComponent()->SetIntensity(3.0f); // 낮에는 강한 빛
         }
-    }
-    else
-    {
-        if (DirectionalLightActor)
+        else
         {
             DirectionalLightActor->SetActorRotation(FRotator(180.f, 0.f, 0.f));
+            DirectionalLightActor->GetLightComponent()->SetIntensity(0.1f); // 밤에는 매우 약한 빛
         }
     }
+
+    if (SkyLightActor && SkyLightActor->GetLightComponent())
+    {
+        USkyLightComponent* SkyLightComp = SkyLightActor->GetLightComponent();
+
+        if (CurrentState == EDayNightState::Day)
+        {
+            SkyLightComp->SetIntensity(1.0f); // 낮에는 기본 밝기 유지
+        }
+        else
+        {
+            SkyLightComp->SetIntensity(0.05f); // 밤에는 전체적으로 어둡게
+        }
+
+        SkyLightComp->MarkRenderStateDirty();
+    }
 }
+
+/** 하늘 구체(BP_Sky_Sphere) 업데이트 */
 
 void ADayNightManager::UpdateSkySphere()
 {
-    // 필요 시 SkySphere 업데이트 로직 추가
-}
-
-void ADayNightManager::SmoothTransitionSunHeight()
-{
-    if (!SkySphere)
+    if (!BP_Sky_Sphere)
     {
-        GetWorldTimerManager().ClearTimer(SmoothTransitionHandle);
+        UE_LOG(LogTemp, Error, TEXT("[DayNightManager] BP_Sky_Sphere is NULL. SkySphere update failed."));
         return;
     }
 
-    CurrentSunHeight = FMath::Lerp(CurrentSunHeight, TargetSunHeight, SunHeightInterpSpeed);
-    SetSunHeight(CurrentSunHeight);
+    float NewSunHeight = (CurrentState == EDayNightState::Day) ? 0.6f : -1.0f;
+    UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] Setting SunHeight to: %f"), NewSunHeight);
 
-    if (FMath::IsNearlyEqual(CurrentSunHeight, TargetSunHeight, 0.05f))
-    {
-        GetWorldTimerManager().ClearTimer(SmoothTransitionHandle);
-    }
-}
+    // 블루프린트의 UpdateSunHeight() 함수 호출
+    FOutputDeviceNull Ar;
+    FString Command = FString::Printf(TEXT("UpdateSunHeight %f"), NewSunHeight);
+    BP_Sky_Sphere->CallFunctionByNameWithArguments(*Command, Ar, nullptr, true);
 
-void ADayNightManager::UpdateSunHeight()
-{
-    if (SkySphere)
-    {
-        UFunction* SetSunHeightFunc = SkySphere->FindFunction(FName("SetSunHeight"));
-        if (SetSunHeightFunc)
-        {
-            struct FSunHeightParams
-            {
-                float SunHeight;
-            };
+    UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] Called UpdateSunHeight in BP_Sky_Sphere"));
 
-            FSunHeightParams Params;
-            Params.SunHeight = bIsDaytime ? 0.6f : -1.0f; // 낮이면 0.6, 밤이면 -1.0
+    // SkySphere의 Sun 방향 업데이트 (기존 블루프린트 함수 호출)
+    BP_Sky_Sphere->CallFunctionByNameWithArguments(TEXT("UpdateSunDirection"), Ar, nullptr, true);
 
-            SkySphere->ProcessEvent(SetSunHeightFunc, &Params);
-        }
-    }
+    UE_LOG(LogTemp, Warning, TEXT("[DayNightManager] Called UpdateSunDirection on BP_Sky_Sphere"));
 }
