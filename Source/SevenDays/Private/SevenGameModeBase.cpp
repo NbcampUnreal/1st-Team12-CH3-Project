@@ -118,6 +118,10 @@ void ASevenGameModeBase::EndWave()
     {
         PC->TestForceDay();
     }
+
+    //좀비 없애기
+
+
 }
 
 /** 낮 시작 */
