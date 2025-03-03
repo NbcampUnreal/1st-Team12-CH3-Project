@@ -107,6 +107,18 @@ protected:
 	int32 Current_maxBullet = 0;
 	//테스트용 끝
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim|Instance")
+	UAnimInstance* ArmsAnimInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim|Montage")
+	UAnimMontage* FireMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim|ArmsUPDownStatus")
+	float ArmsUpDownValue = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim|ArmsUPDownStatus")
+	bool bIsArmsUpDown = false;
+
 	UFUNCTION()
 	void Move(const FInputActionValue& _Value);
 	UFUNCTION()
