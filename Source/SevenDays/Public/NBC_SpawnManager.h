@@ -26,10 +26,10 @@ public:
 	void CreateZombie(int32 count, const FVector SpawnPoint);
 
 	//좀비 전부 죽이거나 지우기
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ClearZombie();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void CreateBoss(const FVector SpawnPoint);
 
 

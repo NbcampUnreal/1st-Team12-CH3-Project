@@ -54,5 +54,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FNBC_ZombieStruct ZombieStat;
 
+private:
+	float MaxWalkSpeed;
+
+	FTimerHandle SlowDelayTimer;
+
+	void MoveSpeedReset();
 
 };

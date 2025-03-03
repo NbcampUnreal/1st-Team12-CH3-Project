@@ -27,7 +27,7 @@ void ANBC_SpawnManager::SummonEnemy(const FVector SpawnPoint)
 		return;
 	}
 
-	if (!ZombieArr.IsEmpty())
+	/*if (!ZombieArr.IsEmpty())
 	{
 		TWeakObjectPtr<AActor> WeakZombie = ZombieArr.Pop();
 
@@ -39,7 +39,7 @@ void ANBC_SpawnManager::SummonEnemy(const FVector SpawnPoint)
 			Zom->SetActorHiddenInGame(false);
 			return;
 		}
-	}
+	}*/
 
 	UClass* ZombieClass = LoadRefClass.LoadSynchronous();
 	if (ZombieClass)
