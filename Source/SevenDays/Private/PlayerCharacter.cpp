@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "MyPlayerController.h"
 #include "TimerManager.h"
+#include "Animation/AnimMontage.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -32,17 +34,25 @@ APlayerCharacter::APlayerCharacter()
 	FPSMeshComponent->bHiddenInGame = false;
 	FPSMeshComponent->bCastDynamicShadow = false;
 	FPSMeshComponent->bCastStaticShadow = false;
-
 	
+	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponComponent"));
+	WeaponComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
+
 	Current_reloadTime = AR_ReloadTime;
 	Current_fireRate = AR_FireRate;
 	Current_currentBullet = AR_CurrentBullet;
 	Current_maxBullet = AR_MaxBullet;
+
+	bMoveSoundInterval = true;
+
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ArmsAnimInstance = FPSMeshComponent->GetAnimInstance();
 
 	ChangeWeaponARDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::AR); });
 	ChangeWeaponHGDelegate.BindLambda([this]() { CompleteChangeWeapon(ECurrentWeaponType::HG); });
@@ -129,6 +139,20 @@ void APlayerCharacter::Move(const FInputActionValue& _Value)
 	if (!Controller)
 		return;
 
+	if(bMoveSoundInterval)
+	{
+		bMoveSoundInterval = false;
+		if (GetCharacterMovement()->MaxWalkSpeed > WalkSpeed)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, SprintSound, GetActorLocation(), 0.1f);
+		}
+		else
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, WalkSound, GetActorLocation(), 0.1f);
+		}
+		GetWorldTimerManager().SetTimer(MoveSoundTimerHandle, this, &APlayerCharacter::EnableWalkSound, 0.5f, false);
+	}
+
 	const FVector2D MoveInput = _Value.Get<FVector2D>();
 
 	if (!FMath::IsNearlyZero(MoveInput.X))
@@ -179,7 +203,7 @@ void APlayerCharacter::StopSprint(const FInputActionValue& _Value)
 {
 	if (!_Value.Get<bool>())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 }
 
@@ -203,37 +227,22 @@ void APlayerCharacter::Fire(const FInputActionValue& _Value)
 {
 	if (_Value.Get<bool>())
 	{
-		if (!bIsFiring && !bIsBulletEmpty && !bIsReloading && !bIsChangingWeapon)
+		if (!bIsFiring && !bIsReloading && !bIsChangingWeapon)
 		{
 			bIsFiring = true;
-			UE_LOG(LogTemp, Warning, TEXT("Excute Fire"));
 			GetWorldTimerManager().SetTimer(FireTimerHandle, this, &APlayerCharacter::EnableFire, AR_FireRate, false);
 
 			if (Current_currentBullet > 0)
 			{
+				ArmsAnimInstance->Montage_Play(FireMontage);
 				Current_currentBullet--;
-				UE_LOG(LogTemp, Warning, TEXT("CurrentBullet : %d"), Current_currentBullet);
+				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 			}
 			else
 			{
 				bIsBulletEmpty = true;
+				UGameplayStatics::PlaySoundAtLocation(this, EmptyBulletSound, GetActorLocation());
 			}
-		}
-		else if (bIsFiring) // 발사 중일 때, 발사 중
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute Fire, Firing"));
-		}
-		else if (bIsBulletEmpty) // 총알이 없을 때, 재장전 필요
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute Fire, Bullet Empty"));
-		}
-		else if (bIsReloading) // 재장전 중일 때, 재장전 중
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute Fire, Reloading"));
-		}
-		else if (bIsChangingWeapon) // 무기 교체 중일 때, 무기 교체 중
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute Fire, Changing Weapon"));
 		}
 	}
 }
@@ -244,18 +253,10 @@ void APlayerCharacter::Reload(const FInputActionValue& _Value)
 	{
 		if (!bIsReloading && !bIsChangingWeapon)
 		{
-			//재장전시 팔 밑으로 내려서 화면에 안보이게 하기
-			UE_LOG(LogTemp, Warning, TEXT("Reload"));
+			bIsArmsUpDown = true;
 			bIsReloading = true;
+			UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
 			GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &APlayerCharacter::CompleteReloading, AR_ReloadTime, false);
-		}
-		else if (bIsChangingWeapon) // 무기 교체 중일 때, 무기 교체 중
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute Reload, Changing Weapon"));
-		}
-		else if (bIsReloading) // 재장전 중일 때, 재장전 중
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute Reload, Reloading"));
 		}
 	}
 }
@@ -266,14 +267,11 @@ void APlayerCharacter::ChangeToAR(const FInputActionValue& _Value)
 	{
 		if (!bIsChangingWeapon) // TODO : 현재 무기가 AR이 아닐 때만 교체 가능하도록 수정
 		{
+			bIsArmsUpDown = true;
 			UE_LOG(LogTemp, Warning, TEXT("ChangeToAR"));
 			bIsChangingWeapon = true;
 			SaveWeaponInfo();
 			GetWorldTimerManager().SetTimer(ChangeWeaponTimerHandle, ChangeWeaponARDelegate, ChangeWeaponTime, false);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute ChangeToAR, Changing Weapon"));
 		}
 	}
 }
@@ -284,14 +282,10 @@ void APlayerCharacter::ChangeToHG(const FInputActionValue& _Value)
 	{
 		if (!bIsChangingWeapon) // TODO : 현재 무기가 HG가 아닐 때만 교체 가능하도록 수정
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ChangeToHG"));
+			bIsArmsUpDown = true;
 			bIsChangingWeapon = true;
 			SaveWeaponInfo();
 			GetWorldTimerManager().SetTimer(ChangeWeaponTimerHandle, ChangeWeaponARDelegate, ChangeWeaponTime, false);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute ChangeToHG, Changing Weapon"));
 		}
 	}
 }
@@ -302,15 +296,11 @@ void APlayerCharacter::ChangeToGL(const FInputActionValue& _Value)
 	{
 		if (!bIsChangingWeapon) // TODO : 현재 무기가 GL이 아닐 때만 교체 가능하도록 수정
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ChangeToGL"));
+			bIsArmsUpDown = true;
 			bIsChangingWeapon = true;
 			SaveWeaponInfo();
 			GetWorldTimerManager().SetTimer(ChangeWeaponTimerHandle, ChangeWeaponARDelegate, ChangeWeaponTime, false);
 
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Not Excute ChangeToGL, Changing Weapon"));
 		}
 	}
 }
@@ -319,7 +309,6 @@ void APlayerCharacter::WheelUp(const FInputActionValue& _Value)
 {
 	if (_Value.Get<bool>()) // 어케 만들지 고민중
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WheelUp"));
 	}
 }
 
@@ -327,7 +316,6 @@ void APlayerCharacter::WheelDown(const FInputActionValue& _Value)
 {
 	if (_Value.Get<bool>()) // 어케 만들지 고민중
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WheelDown"));
 	}
 }
 
@@ -386,14 +374,17 @@ void APlayerCharacter::EnableFire()
 void APlayerCharacter::CompleteReloading()
 {
 	GetWorldTimerManager().ClearTimer(ReloadTimerHandle);
+	bIsArmsUpDown = false;
 	bIsReloading = false;
 	bIsBulletEmpty = false;
+	UGameplayStatics::PlaySoundAtLocation(this, CompleteReloadSound, GetActorLocation());
 	Current_currentBullet = Current_maxBullet;
 }
 
 void APlayerCharacter::CompleteChangeWeapon(ECurrentWeaponType _EType)
 {
 	GetWorldTimerManager().ClearTimer(ChangeWeaponTimerHandle);
+	bIsArmsUpDown = false;
 	bIsChangingWeapon = false;
 	CurrentWeaponType = _EType;
 	switch (CurrentWeaponType)
@@ -417,4 +408,10 @@ void APlayerCharacter::CompleteChangeWeapon(ECurrentWeaponType _EType)
 		Current_maxBullet = GL_MaxBullet;
 		break;
 	}
+}
+
+void APlayerCharacter::EnableWalkSound()
+{
+	bMoveSoundInterval = true;
+	GetWorldTimerManager().ClearTimer(MoveSoundTimerHandle);
 }

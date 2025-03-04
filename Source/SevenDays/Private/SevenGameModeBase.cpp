@@ -74,7 +74,7 @@ void ASevenGameModeBase::StartWave()
     if (SpawnManager)
     {
         int32 SpawnCount = FMath::Clamp(CurrentWave * 5, 5, 50);
-        SpawnManager->CreateZombie(SpawnCount, FVector(0.0f, 0.0f, 100.0f));
+        SpawnManager->CreateZombie(SpawnCount, FVector(523.0f, -293.0f, 101.0f));
 
         SetTotalZombies(SpawnCount);
     }
