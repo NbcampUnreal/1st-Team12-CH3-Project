@@ -56,11 +56,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	UInputAction* ChangeGLAction;
 
+	/** 낮/밤 전환 입력 액션 테스트용 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	UInputAction* WheelUpAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	UInputAction* WheelDownAction;
-
+	UInputAction* ToggleDayNightAction;
 protected:
 };

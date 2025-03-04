@@ -112,12 +112,7 @@ void ASevenGameModeBase::EndWave()
 
     }
 
-    // 낮으로 변경
-    ASevenPlayerController* PC = Cast<ASevenPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-    if (PC)
-    {
-        PC->TestForceDay();
-    }
+    TestForceDay();
 
     //좀비 없애기
 
@@ -199,11 +194,7 @@ void ASevenGameModeBase::SwitchToDay()
         UE_LOG(LogTemp, Warning, TEXT("All Zombies Killed! Switching to Day."));
 
         // 게임 모드에서 낮으로 전환
-        ASevenPlayerController* PC = Cast<ASevenPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-        if (PC)
-        {
-            PC->TestForceDay();
-        }
+        TestForceDay();
     }
 }
 

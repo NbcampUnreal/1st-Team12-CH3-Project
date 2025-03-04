@@ -17,8 +17,7 @@ AMyPlayerController::AMyPlayerController()
 	ChangeARAction = nullptr;
 	ChangeHGAction = nullptr;
 	ChangeGLAction = nullptr;
-	WheelUpAction = nullptr;
-	WheelDownAction = nullptr;
+	ToggleDayNightAction = nullptr;
 }
 
 void AMyPlayerController::BeginPlay()
