@@ -15,6 +15,7 @@
 #include "SevenGameModeBase.h"
 #include "SevenGameStateBase.h"
 #include "SevenUserWidget.h"
+#include "TestGun/NBC_BaseGun.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -37,6 +38,8 @@ APlayerCharacter::APlayerCharacter()
 	FPSMeshComponent->bHiddenInGame = false;
 	FPSMeshComponent->bCastDynamicShadow = false;
 	FPSMeshComponent->bCastStaticShadow = false;
+	
+	Current_Weapon = NewObject<UNBC_BaseGun>();
 
 	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponComponent"));
 	WeaponComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
@@ -49,6 +52,9 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Current_Weapon->SetPlayer(UGameplayStatics::GetPlayerPawn(GetWorld(), 0), GetWorld()->GetFirstPlayerController());
+	GetWorldTimerManager().SetTimer(RecoilTimerHandle, this, &APlayerCharacter::ReduceRecoil, 0.1f, true);
 
 	ArmsAnimInstance = FPSMeshComponent->GetAnimInstance();
 
@@ -231,6 +237,7 @@ void APlayerCharacter::Fire(const FInputActionValue& _Value)
 			if (Current_LeftBullet > 0)
 			{
 				ArmsAnimInstance->Montage_Play(FireMontage);
+				Current_Weapon->Fire();
 				Current_LeftBullet--;
 				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 			}
@@ -464,4 +471,9 @@ void APlayerCharacter::EnableWalkSound()
 {
 	bMoveSoundInterval = true;
 	GetWorldTimerManager().ClearTimer(MoveSoundTimerHandle);
+}
+
+void APlayerCharacter::ReduceRecoil()
+{
+	Current_Weapon->ReCoilDelayReduction();
 }

@@ -33,13 +33,16 @@ public:
 	void ReLoad() override;
 
 	//플레이어 지정
-	void SetPlayer(AActor* player , APlayerController* PlayerController);
+	void SetPlayer(APawn* player , APlayerController* PlayerController);
 
 	//반동
 	void ApplyRecoli();
 
 	UFUNCTION(BlueprintCallable)
 	void Fire() override;
+
+	//총 반동 타이머
+	void ReCoilDelayReduction();
 
 protected:
 
@@ -75,9 +78,6 @@ private:
 
 	//재장전 딜레이
 	void ReloadDelayReduction();
-
-	//총 반동 타이머
-	void ReCoilDelayReduction();
 
 	//현재 총알개수
 	int32 CurrentBulletCount;

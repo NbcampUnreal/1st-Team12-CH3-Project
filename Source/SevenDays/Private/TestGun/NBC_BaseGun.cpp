@@ -34,7 +34,7 @@ void UNBC_BaseGun::MoveStopReCoil()
 int32 UNBC_BaseGun::Shot( )
 {
 	if (Player == nullptr)
-		return;
+		return 0;
 
 	/*if (fShotDelay > 0)
 	{
@@ -111,7 +111,7 @@ void UNBC_BaseGun::ReLoad()
 }
 
 //플레이어 지정 및 컨트롤러 지정 //액터로 지정했으면 어땟을까 건매니저
-void UNBC_BaseGun::SetPlayer(AActor* player, APlayerController* playerController)
+void UNBC_BaseGun::SetPlayer(APawn* player, APlayerController* playerController)
 {
 	Player = nullptr;
 	Player = player;
@@ -127,6 +127,9 @@ void UNBC_BaseGun::ApplyRecoli()
 
 	float ReCoilX = FMath::RandRange(-ShotReCoilX, ShotReCoilX); // 좌우
 	float ReCoilY = FMath::RandRange(ShotReCoilY * 0.5f, ShotReCoilY); // 위아래
+
+	UE_LOG(LogTemp, Warning, TEXT("--------------  %f"), ReCoilX);
+	UE_LOG(LogTemp, Warning, TEXT("||||||||||||||  %f"), ReCoilY);
 
 	PlayerController->AddPitchInput(-ReCoilY);
 	PlayerController->AddYawInput(ReCoilX);
@@ -164,13 +167,8 @@ void UNBC_BaseGun::ReloadDelayReduction()
 //반동 딜레이 줄이기
 void UNBC_BaseGun::ReCoilDelayReduction()
 {
-	if (ShotReCoilX > 0)
-	{
-		ShotReCoilX -= Player->GetWorld()->DeltaTimeSeconds;
-	}
+	ShotReCoilX = FMath::Clamp(ShotReCoilX - Player->GetWorld()->DeltaTimeSeconds, 0, fMaxShotReCoilX);
 
-	if (ShotReCoilY > 0)
-	{
-		ShotReCoilY -= Player->GetWorld()->DeltaTimeSeconds;
-	}
+	ShotReCoilY = FMath::Clamp(ShotReCoilY - Player->GetWorld()->DeltaTimeSeconds, 0, fMaxShotReCoilY);
+
 }

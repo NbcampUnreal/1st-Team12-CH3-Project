@@ -12,6 +12,7 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UCharacterMovementComponent;
+class UNBC_BaseGun;
 
 struct FInputActionValue;
 
@@ -106,6 +107,11 @@ protected:
 	int32 Current_MaxBullet = 0;
 	//테스트용 끝
 
+	//총기
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|Gun")
+	UNBC_BaseGun* Current_Weapon;
+	//총기 끝
+
 	//애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim|Instance")
 	UAnimInstance* ArmsAnimInstance;
@@ -183,6 +189,7 @@ protected:
 	EPlayerWeaponType CurrentWeaponType = EPlayerWeaponType::AR;
 
 	FTimerHandle FireTimerHandle; // 사격간 지연시간
+	FTimerHandle RecoilTimerHandle; // 지속적으로 반동을 줄임
 	FTimerHandle ReloadTimerHandle; // 재장전 시간
 	FTimerHandle ChangeWeaponTimerHandle; // 무기 교체 시간
 
@@ -201,4 +208,5 @@ protected:
 	void CompleteReloading(); // 재장전 가능
 	void CompleteChangeWeapon(EPlayerWeaponType _EType); // 무기 변경 가능
 	void EnableWalkSound(); // 소리 재생 가능
+	void ReduceRecoil();
 };
