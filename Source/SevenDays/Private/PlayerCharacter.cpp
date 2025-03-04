@@ -11,6 +11,7 @@
 #include "MyPlayerController.h"
 #include "TimerManager.h"
 #include "Animation/AnimMontage.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -34,10 +35,17 @@ APlayerCharacter::APlayerCharacter()
 	FPSMeshComponent->bCastDynamicShadow = false;
 	FPSMeshComponent->bCastStaticShadow = false;
 	
+	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponComponent"));
+	WeaponComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
+
 	Current_reloadTime = AR_ReloadTime;
 	Current_fireRate = AR_FireRate;
 	Current_currentBullet = AR_CurrentBullet;
 	Current_maxBullet = AR_MaxBullet;
+
+	bMoveSoundInterval = true;
+
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -131,6 +139,20 @@ void APlayerCharacter::Move(const FInputActionValue& _Value)
 	if (!Controller)
 		return;
 
+	if(bMoveSoundInterval)
+	{
+		bMoveSoundInterval = false;
+		if (GetCharacterMovement()->MaxWalkSpeed > WalkSpeed)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, SprintSound, GetActorLocation(), 0.1f);
+		}
+		else
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, WalkSound, GetActorLocation(), 0.1f);
+		}
+		GetWorldTimerManager().SetTimer(MoveSoundTimerHandle, this, &APlayerCharacter::EnableWalkSound, 0.5f, false);
+	}
+
 	const FVector2D MoveInput = _Value.Get<FVector2D>();
 
 	if (!FMath::IsNearlyZero(MoveInput.X))
@@ -181,7 +203,7 @@ void APlayerCharacter::StopSprint(const FInputActionValue& _Value)
 {
 	if (!_Value.Get<bool>())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
 }
 
@@ -205,20 +227,21 @@ void APlayerCharacter::Fire(const FInputActionValue& _Value)
 {
 	if (_Value.Get<bool>())
 	{
-		if (!bIsFiring && !bIsBulletEmpty && !bIsReloading && !bIsChangingWeapon)
+		if (!bIsFiring && !bIsReloading && !bIsChangingWeapon)
 		{
-			ArmsAnimInstance->Montage_Play(FireMontage);
 			bIsFiring = true;
 			GetWorldTimerManager().SetTimer(FireTimerHandle, this, &APlayerCharacter::EnableFire, AR_FireRate, false);
 
 			if (Current_currentBullet > 0)
 			{
+				ArmsAnimInstance->Montage_Play(FireMontage);
 				Current_currentBullet--;
-				UE_LOG(LogTemp, Warning, TEXT("CurrentBullet : %d"), Current_currentBullet);
+				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 			}
 			else
 			{
 				bIsBulletEmpty = true;
+				UGameplayStatics::PlaySoundAtLocation(this, EmptyBulletSound, GetActorLocation());
 			}
 		}
 	}
@@ -232,6 +255,7 @@ void APlayerCharacter::Reload(const FInputActionValue& _Value)
 		{
 			bIsArmsUpDown = true;
 			bIsReloading = true;
+			UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
 			GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &APlayerCharacter::CompleteReloading, AR_ReloadTime, false);
 		}
 	}
@@ -353,6 +377,7 @@ void APlayerCharacter::CompleteReloading()
 	bIsArmsUpDown = false;
 	bIsReloading = false;
 	bIsBulletEmpty = false;
+	UGameplayStatics::PlaySoundAtLocation(this, CompleteReloadSound, GetActorLocation());
 	Current_currentBullet = Current_maxBullet;
 }
 
@@ -383,4 +408,10 @@ void APlayerCharacter::CompleteChangeWeapon(ECurrentWeaponType _EType)
 		Current_maxBullet = GL_MaxBullet;
 		break;
 	}
+}
+
+void APlayerCharacter::EnableWalkSound()
+{
+	bMoveSoundInterval = true;
+	GetWorldTimerManager().ClearTimer(MoveSoundTimerHandle);
 }

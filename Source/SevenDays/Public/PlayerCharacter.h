@@ -32,8 +32,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	float NormalSpeed = 400.0f;
+	float WalkSpeed = 400.0f;
 	float SprintSpeed = 700.0f;
+
+	bool bMoveSoundInterval = false;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SkeletalMesh")
@@ -47,6 +49,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+	USkeletalMeshComponent* WeaponComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float Health = 100.0f;
@@ -107,7 +112,7 @@ protected:
 	int32 Current_maxBullet = 0;
 	//테스트용 끝
 
-
+	//애니메이션
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim|Instance")
 	UAnimInstance* ArmsAnimInstance;
 
@@ -118,6 +123,30 @@ protected:
 	float ArmsUpDownValue = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim|ArmsUPDownStatus")
 	bool bIsArmsUpDown = false;
+	//애니메이션 끝
+
+	//사운드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* FireSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* ReloadSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* CompleteReloadSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* ChangeWeaponSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* EmptyBulletSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* WalkSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* SprintSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* LandSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* DeathSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
+	USoundBase* HitSound;
+	//사운드 끝
 
 	UFUNCTION()
 	void Move(const FInputActionValue& _Value);
@@ -181,4 +210,7 @@ protected:
 	FTimerDelegate ChangeWeaponGLDelegate;
 
 	void CompleteChangeWeapon(ECurrentWeaponType _EType); // 무기 변경 가능
+
+	FTimerHandle MoveSoundTimerHandle;
+	void EnableWalkSound();
 };
