@@ -80,14 +80,6 @@ void ASevenPlayerController::BeginPlay()
         }
     }
 
-    // Enhanced Input 시스템을 사용하여 입력 매핑 추가 (게임 레벨에서만)
-    if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-    {
-        if (InputMappingContext)
-        {
-            Subsystem->AddMappingContext(InputMappingContext, 1);
-        }
-    }
 
     // 기본 무기 설정 (Assault Rifle)
     SwitchWeapon(EPlayerWeaponType::AR);
@@ -186,7 +178,7 @@ void ASevenPlayerController::SetupInputComponent()
     }
 
     UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
-    if (!EnhancedInput)
+    if (EnhancedInput)
     {
         if (MoveAction) EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASevenPlayerController::Move);
         if (LookAction) EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASevenPlayerController::Look);
