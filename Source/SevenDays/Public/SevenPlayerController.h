@@ -40,8 +40,6 @@ protected:
     /** 현재 선택된 무기 타입 (기본은 Assault Rifle) */
     EPlayerWeaponType CurrentWeaponType = EPlayerWeaponType::AR;
 
-    /** 현재 게임이 밤인지 여부 */
-    bool bIsNight = false;
 
     /** 현재 레벨이 메인 메뉴인지 여부 */
     bool bIsMainMenu = false;
@@ -52,16 +50,6 @@ public:
     /** 마우스 커서 표시 여부 설정 함수 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void SetMouseVisibility(bool bVisible);
-
-
-
-    /** 무기 선택 입력 액션 (1, 2, 3번 키) */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-    UInputAction* IA_ChangeWeapon_AR;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-    UInputAction* IA_ChangeWeapon_HG;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-    UInputAction* IA_ChangeWeapon_GL;
 
     /** 입력 매핑 컨텍스트 (Enhanced Input) */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input|IMC")
@@ -88,16 +76,9 @@ public:
     UInputAction* ChangeHGAction;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
     UInputAction* ChangeGLAction;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-    UInputAction* WheelUpAction;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-    UInputAction* WheelDownAction;
 
-    void Move(const FInputActionValue& Value);
-    void Look(const FInputActionValue& Value);
-    void StartJump();
-    void StopJump();
-    void Fire(const FInputActionValue& Value);
+    /** 현재 게임이 밤인지 여부 */
+    bool bIsNight = false;
 
 
 
@@ -117,15 +98,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateHealth(float HealthPercent);
 
-    /** 무기 전환 함수 */
-    UFUNCTION(BlueprintCallable, Category = "Weapon")
-    void SwitchWeapon(EPlayerWeaponType NewWeaponType);
-
-    /** 무기 선택 핸들러 (입력과 연결되어 호출됨) */
-    void OnSelectWeaponAR();
-    void OnSelectWeaponHG();
-    void OnSelectWeaponGL();
-
     UFUNCTION(BlueprintCallable, Category = "UI")
     void UpdateWeaponUI(const FString& WeaponName, int32 CurrentAmmo, int32 MaxAmmo);
 
@@ -133,18 +105,10 @@ public:
     void UpdateZombieUI();
 
 
-    /** 낮/밤 강제 전환 (테스트용) */
-    UFUNCTION(BlueprintCallable, Category = "Test")
-    void TestForceDay();
-    UFUNCTION(BlueprintCallable, Category = "Test")
-    void TestForceNight();
-
     /** 게임 UI (HUD) 표시 함수 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ShowGameUI();
 
-    /** 낮/밤 전환 함수 */
-    void ToggleDayNight();
 
     /** 게임 오버 UI 표시 함수 */
     void ShowGameOverScreen();

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "SevenUserWidget.h"
 #include "PlayerCharacter.generated.h"
 
 class UCapsuleComponent;
@@ -13,13 +14,6 @@ class USpringArmComponent;
 class UCharacterMovementComponent;
 
 struct FInputActionValue;
-
-enum ECurrentWeaponType
-{
-	AR,
-	HG,
-	GL
-};
 
 UCLASS()
 class SEVENDAYS_API APlayerCharacter : public ACharacter
@@ -107,9 +101,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
 	float Current_fireRate = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	int32 Current_currentBullet = 0;
+	int32 Current_LeftBullet = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	int32 Current_maxBullet = 0;
+	int32 Current_MaxBullet = 0;
 	//테스트용 끝
 
 	//애니메이션
@@ -183,34 +177,28 @@ protected:
 	UFUNCTION()
 	void ChangeToGL(const FInputActionValue& _Value);
 
-	UFUNCTION()
-	void WheelUp(const FInputActionValue& _Value);
+	UFUNCTION() // 테스트용
+	void ToggleDayNight(const FInputActionValue& _Value);
 
-	UFUNCTION()
-	void WheelDown(const FInputActionValue& _Value);
+	EPlayerWeaponType CurrentWeaponType = EPlayerWeaponType::AR;
 
+	FTimerHandle FireTimerHandle; // 사격간 지연시간
+	FTimerHandle ReloadTimerHandle; // 재장전 시간
+	FTimerHandle ChangeWeaponTimerHandle; // 무기 교체 시간
 
-
-	ECurrentWeaponType CurrentWeaponType = ECurrentWeaponType::AR;
-
-	void SaveWeaponInfo();
-
-	void OnDeath(); //죽었을 때
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override; //데미지를 받았을 때
-	
-	FTimerHandle FireTimerHandle;
-	void EnableFire(); // 발사 가능
-
-	FTimerHandle ReloadTimerHandle;
-	void CompleteReloading(); // 재장전 가능
-
-	FTimerHandle ChangeWeaponTimerHandle;
+	//무기 교체시 파라미터 전달을 위한 델리게이트
 	FTimerDelegate ChangeWeaponARDelegate;
 	FTimerDelegate ChangeWeaponHGDelegate;
 	FTimerDelegate ChangeWeaponGLDelegate;
 
-	void CompleteChangeWeapon(ECurrentWeaponType _EType); // 무기 변경 가능
 
-	FTimerHandle MoveSoundTimerHandle;
-	void EnableWalkSound();
+	FTimerHandle MoveSoundTimerHandle; // 이동 중 소리 겹치지 않게 하기 위한 지연시간
+	void SaveWeaponInfo();
+
+	void OnDeath(); //죽었을 때
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override; //데미지를 받았을 때
+	void EnableFire(); // 발사 가능
+	void CompleteReloading(); // 재장전 가능
+	void CompleteChangeWeapon(EPlayerWeaponType _EType); // 무기 변경 가능
+	void EnableWalkSound(); // 소리 재생 가능
 };
