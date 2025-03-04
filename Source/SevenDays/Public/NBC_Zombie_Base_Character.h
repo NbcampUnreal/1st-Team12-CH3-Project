@@ -54,11 +54,24 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FNBC_ZombieStruct ZombieStat;
 
+	//좀비 사운드
+	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Sound")
+	USoundBase* ZombieSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ZombieHitSound;
+
+
 private:
 	float MaxWalkSpeed;
 
 	FTimerHandle SlowDelayTimer;
 
 	void MoveSpeedReset();
+
+	//사운드 재생
+	void PlaySound();
+
+	FTimerHandle SoundTimer;
 
 };

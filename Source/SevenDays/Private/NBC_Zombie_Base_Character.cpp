@@ -40,6 +40,13 @@ void ANBC_Zombie_Base_Character::BeginPlay()
 	FTimerHandle Die;
 
 	//GetWorldTimerManager().SetTimer(Die, this, &ANBC_Zombie_Base_Character::Death, 5, false);
+
+
+	if (GetWorldTimerManager().IsTimerActive(SoundTimer) == false)
+	{
+		GetWorldTimerManager().SetTimer(SoundTimer, this, &ANBC_Zombie_Base_Character::PlaySound, 3, true);
+	}
+	
 }
 
 // Called every frame
@@ -63,6 +70,11 @@ void ANBC_Zombie_Base_Character::SetActorHiddenInGame(bool bNewHidden)
 
 float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (ZombieHitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ZombieHitSound, GetActorLocation());
+	}
+
 	//피격시 스피드를 느리게 해주기 //
 	
 	ZombieStat.CurrentHp -= DamageAmount;
@@ -72,6 +84,7 @@ float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent co
 		//실행중
 	}
 	else {
+		//만약 타이머가 실행이안되고 있었다면 실행
 		GetWorldTimerManager().SetTimer(SlowDelayTimer, this, &ANBC_Zombie_Base_Character::MoveSpeedReset, 1.5f, false);
 	}
 
@@ -163,6 +176,16 @@ void ANBC_Zombie_Base_Character::MoveSpeedReset()
 {
 	//속도 원상복귀
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+
+	GetWorldTimerManager().ClearTimer(SlowDelayTimer);
+}
+
+void ANBC_Zombie_Base_Character::PlaySound()
+{
+	if (ZombieSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ZombieSound, GetActorLocation());
+	}
 }
 
 
