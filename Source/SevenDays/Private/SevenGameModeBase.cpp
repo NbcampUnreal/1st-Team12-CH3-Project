@@ -112,10 +112,10 @@ void ASevenGameModeBase::EndWave()
 
     }
 
-    TestForceDay();
-
-    //좀비 없애기
-
+    if (!bIsNight)
+    {
+        TestForceDay(); // 낮일 때만 실행
+    }
 
 }
 
@@ -123,9 +123,13 @@ void ASevenGameModeBase::EndWave()
 void ASevenGameModeBase::StartDayPhase()
 {
     bIsNight = false;
-    if (DayNightManager)
+    if (DayNightManager) // NULL 체크 추가
     {
         DayNightManager->SetDayNightState(EDayNightState::Day);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SevenGameModeBase] DayNightManager is NULL!"));
     }
     UpdateDayNightUI();
 }
@@ -134,9 +138,13 @@ void ASevenGameModeBase::StartDayPhase()
 void ASevenGameModeBase::StartNightPhase()
 {
     bIsNight = true;
-    if (DayNightManager)
+    if (DayNightManager) // NULL 체크 추가
     {
         DayNightManager->SetDayNightState(EDayNightState::Night);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SevenGameModeBase] DayNightManager is NULL!"));
     }
     StartWave();
     UpdateDayNightUI();
