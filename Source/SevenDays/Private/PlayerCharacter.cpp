@@ -153,9 +153,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
-void APlayerCharacter::SupplyARBullet()
+void APlayerCharacter::SupplyARBullet(int _addBullet)
 {
-	//Åº ¹è±Þ
 }
 
 void APlayerCharacter::Move(const FInputActionValue& _Value)

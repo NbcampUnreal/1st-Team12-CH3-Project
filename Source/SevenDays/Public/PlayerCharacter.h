@@ -64,7 +64,7 @@ public:
 	float MaxHealth = 100.0f;
 
 	UFUNCTION()
-	void SupplyARBullet();
+	void SupplyARBullet(int _addBullet);
 
 protected:
 	//테스트용
