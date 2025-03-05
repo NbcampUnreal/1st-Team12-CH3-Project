@@ -4,6 +4,10 @@
 #include "GameFramework/GameModeBase.h"
 #include "DayNightManager.h"
 #include "NBC_SpawnManager.h"
+#include "MiniGameAvoid.h"  
+#include "UObject/ObjectMacros.h" 
+#include "UObject/ScriptMacros.h" 
+
 #include "SevenGameModeBase.generated.h"
 
 
@@ -23,6 +27,11 @@ class SEVENDAYS_API ASevenGameModeBase : public AGameModeBase
 public:
     ASevenGameModeBase();
 
+    /** 미니게임 완료 후 밤 시작*/
+
+  
+    void OnMiniGameCompleted();
+
     /** 웨이브 시작 */
     void StartWave();
 
@@ -39,9 +48,19 @@ public:
     /** 낮으로 전환 */
     void SwitchToDay();
 
+    /** 미니게임 시작 */
+    void StartMiniGame();
+
+    /** 미니게임 종료 후 FPS 본 게임 시작 */
+    void EndMiniGame();
+
+
+
+
+
 protected:
     virtual void BeginPlay() override;
-    virtual void StartPlay() override;
+   
 
     /** 낮 시작 */
     void StartDayPhase();
@@ -49,8 +68,6 @@ protected:
     /** 밤 시작 */
     void StartNightPhase();
 
-    /** 미니게임 완료 후 밤 시작 */
-    void OnMiniGameCompleted();
 
     /** UI 업데이트 (낮/밤 전환) */
     void UpdateDayNightUI();
@@ -82,6 +99,20 @@ protected:
 
     /** 웨이브 최대 개수 */
     const int32 WaveLimit = 7;
+
+
+
+private:
+
+    /** 미니게임 위젯 클래스 */
+    UPROPERTY(EditDefaultsOnly, Category = "MiniGame")
+    TSubclassOf<UMiniGameAvoid> MiniGameClass;
+
+    /** 미니게임 위젯 인스턴스 */
+    UPROPERTY()
+    UMiniGameAvoid* MiniGameInstance;
+
+
 
 public:
     /** 낮으로 강제 변경 (테스트용) */
