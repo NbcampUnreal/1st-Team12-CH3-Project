@@ -66,7 +66,6 @@ protected:
     UPROPERTY(meta = (BindWidget)) UTextBlock* AmmoText;
 
     /** 무기 UI */
-    /** 무기 UI */
     UPROPERTY(meta = (BindWidget)) UTextBlock* WeaponText;
     UPROPERTY(meta = (BindWidget)) UTextBlock* WeaponNameText; 
 
@@ -86,11 +85,11 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UWidget* GameOverScreen;
 
-    /** Quit 버튼 */
-    UPROPERTY(meta = (BindWidget))
-    UButton* QuitButton;
-
-    /** Quit 버튼 클릭 이벤트 */
-    UFUNCTION()
-    void OnQuitButtonClicked();
+   // /** Quit 버튼 */
+   // UPROPERTY(meta = (BindWidget))
+   // UButton* QuitButton;
+   // 
+   // /** Quit 버튼 클릭 이벤트 */
+   // UFUNCTION()
+   // void OnQuitButtonClicked();
 };

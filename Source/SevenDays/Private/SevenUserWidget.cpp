@@ -6,24 +6,37 @@
 #include "Engine/Engine.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-/// 위젯 초기화: 위젯이 생성될 때 UI 요소들을 초기화하고 검증합니다.
+
+/// UI 요소 검증
+bool USevenUserWidget::EnsureWidget(UWidget* Widget, const FString& WidgetName)
+{
+    if (!Widget)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SevenUserWidget] %s is NULL!"), *WidgetName);
+        return false;
+    }
+    return true;
+}
+
+
+/// 위젯 초기화
 void USevenUserWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    // Quit 버튼 이벤트 바인딩 (게임 오버 시나 종료 시 사용)
-    if (QuitButton)
-    {
-        QuitButton->OnClicked.AddDynamic(this, &USevenUserWidget::OnQuitButtonClicked);
-    }
+   // // Quit 버튼
+   // if (QuitButton)
+   // {
+   //     QuitButton->OnClicked.AddDynamic(this, &USevenUserWidget::OnQuitButtonClicked);
+   // }
 
-    // 게임 오버 UI는 기본적으로 숨김 처리합니다.
+    // 게임 오버 UI = Hidden
     if (GameOverScreen)
     {
         GameOverScreen->SetVisibility(ESlateVisibility::Hidden);
     }
 
-    // UI 요소들을 검증합니다.
+    // UI 요소
     bool bAllWidgetsValid = true;
     if (!EnsureWidget(HealthBar, "HealthBar")) bAllWidgetsValid = false;
     if (!EnsureWidget(HealthText, "HealthText")) bAllWidgetsValid = false;
@@ -38,68 +51,49 @@ void USevenUserWidget::NativeConstruct()
 
     if (!bAllWidgetsValid)
     {
-        UE_LOG(LogTemp, Error, TEXT("[SevenUserWidget] 일부 UI 요소가 NULL 상태입니다."));
+        UE_LOG(LogTemp, Error, TEXT("[SevenUserWidget] UI NULL "));
     }
 
     // 기본 UI 값 설정
     ZombiesText->SetText(FText::FromString(TEXT("0 / 0")));
     UpdateAmmo(0, 0);
     UpdateDayNightCycle(false);
+
 }
 
-/// UI 요소 검증 함수: 특정 위젯이 바인딩되었는지 확인합니다.
-bool USevenUserWidget::EnsureWidget(UWidget* Widget, const FString& WidgetName)
-{
-    if (!Widget)
-    {
-        UE_LOG(LogTemp, Error, TEXT("[SevenUserWidget] %s is NULL!"), *WidgetName);
-        return false;
-    }
-    return true;
-}
 
-/// 체력 UI 업데이트: 체력바와 체력 텍스트를 업데이트합니다.
+/// 체력 UI 업데이트
 void USevenUserWidget::UpdateHealth(float HealthPercent)
 {
     if (!HealthBar || !HealthText) return;
 
+    // 체력 값을 안전한 범위(0 ~ 1)로 제한
     HealthPercent = FMath::Clamp(HealthPercent, 0.0f, 1.0f);
     HealthBar->SetPercent(HealthPercent);
     HealthText->SetText(FText::AsNumber(static_cast<int32>(HealthPercent * 100)));
 
     UE_LOG(LogTemp, Log, TEXT("[SevenUserWidget] Health Updated: %d%%"), static_cast<int32>(HealthPercent * 100));
+
+    // 체력이 0일 때 게임 오버 UI 표시
+    if (HealthPercent <= 0.0f)
+    {
+        ShowGameOverUI();
+    }
 }
 
-/// 탄약 UI 업데이트: 현재 탄약과 총 탄약을 텍스트로 표시합니다.
-void USevenUserWidget::UpdateAmmo(int32 CurrentAmmo, int32 TotalAmmo)
-{
-    if (!AmmoText) return;
 
-    AmmoText->SetText(FText::Format(FText::FromString(TEXT("{0} / {1}")), CurrentAmmo, TotalAmmo));
-    UE_LOG(LogTemp, Log, TEXT("[SevenUserWidget] Ammo Updated: %d / %d"), CurrentAmmo, TotalAmmo);
-}
 
-/// 무기 UI 업데이트: 무기 이름과 탄약, 선택된 무기 아이콘의 투명도를 업데이트합니다.
+/// 무기 UI 업데이트
 void USevenUserWidget::UpdateWeaponUI(const FString& WeaponName, int32 CurrentAmmo, int32 MaxAmmo)
 {
-    if (!WeaponNameText || !AmmoText)
-    {
-        UE_LOG(LogTemp, Error, TEXT("WeaponNameText or AmmoText is NULL! Check UMG bindings."));
-        return;
-    }
-
-    WeaponNameText->SetText(FText::FromString(WeaponName));
-    AmmoText->SetText(FText::Format(FText::FromString("{0} / {1}"),
-        FText::AsNumber(CurrentAmmo),
-        FText::AsNumber(MaxAmmo)));
-
-    //강제업데이트
-   // WeaponNameText->InvalidateLayoutAndVolatility();
-  //  AmmoText->InvalidateLayoutAndVolatility();
+    UpdateWeaponName(WeaponName);  // 무기 이름 업데이트
+    UpdateAmmo(CurrentAmmo, MaxAmmo);  // 탄약 정보 업데이트
 
     UE_LOG(LogTemp, Warning, TEXT("Weapon UI Updated: %s, %d / %d"), *WeaponName, CurrentAmmo, MaxAmmo);
 }
 
+
+// 무기 UI 투명도 설정
 void USevenUserWidget::UpdateWeaponIcons(EPlayerWeaponType WeaponType)
 {
     if (!ARImage || !PistolImage || !GrenadeImage)
@@ -108,25 +102,31 @@ void USevenUserWidget::UpdateWeaponIcons(EPlayerWeaponType WeaponType)
         return;
     }
 
-    // 기본적으로 모든 아이콘을 반투명 (Alpha = 0.1)으로 설정
-    ARImage->SetRenderOpacity(0.5f);
-    PistolImage->SetRenderOpacity(0.5f);
-    GrenadeImage->SetRenderOpacity(0.5f);
+    // 모든 아이콘을 기본적으로 흐리게 설정
+    float InactiveOpacity = 0.2f;
+    float ActiveOpacity = 1.0f;
 
-    // 선택된 무기만 불투명 (Alpha = 1.0) 설정
+    ARImage->SetRenderOpacity(InactiveOpacity);
+    PistolImage->SetRenderOpacity(InactiveOpacity);
+    GrenadeImage->SetRenderOpacity(InactiveOpacity);
+
+    // 선택된 무기만 강조
     switch (WeaponType)
     {
     case EPlayerWeaponType::AR:
-        ARImage->SetRenderOpacity(1.0f);
+        ARImage->SetRenderOpacity(ActiveOpacity);
         break;
     case EPlayerWeaponType::Pistol:
-        PistolImage->SetRenderOpacity(1.0f);
+        PistolImage->SetRenderOpacity(ActiveOpacity);
         break;
     case EPlayerWeaponType::Grenade:
-        GrenadeImage->SetRenderOpacity(1.0f);
+        GrenadeImage->SetRenderOpacity(ActiveOpacity);
         break;
     }
+
+    UE_LOG(LogTemp, Log, TEXT("Weapon Icon Updated: %d"), (int32)WeaponType);
 }
+
 
 
 void USevenUserWidget::UpdateWeaponName(const FString& WeaponName)
@@ -140,6 +140,18 @@ void USevenUserWidget::UpdateWeaponName(const FString& WeaponName)
     WeaponText->SetText(FText::FromString(WeaponName));
 }
 
+
+/// 탄약 UI 업데이트
+void USevenUserWidget::UpdateAmmo(int32 CurrentAmmo, int32 TotalAmmo)
+{
+    if (!AmmoText) return;
+
+    AmmoText->SetText(FText::Format(FText::FromString(TEXT("{0} / {1}")),
+        FText::AsNumber(CurrentAmmo),
+        FText::AsNumber(TotalAmmo)));
+
+    UE_LOG(LogTemp, Log, TEXT("[SevenUserWidget] Ammo Updated: %d / %d"), CurrentAmmo, TotalAmmo);
+}
 
 
 /// 좀비 수 UI 업데이트: 남은 좀비 수와 전체 좀비 수를 텍스트로 표시합니다.
@@ -162,19 +174,26 @@ void USevenUserWidget::UpdateDayNightCycle(bool bIsNight)
     MoonImage->SetVisibility(bIsNight ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
-/// 게임 오버 UI 표시: 게임 오버 화면 위젯의 가시성을 변경합니다.
+
+
+/// ShowGameOverUI
 void USevenUserWidget::ShowGameOverUI()
 {
-    if (GameOverScreen)
+    if (!GameOverScreen)
     {
-        GameOverScreen->SetVisibility(ESlateVisibility::Visible);
+        UE_LOG(LogTemp, Error, TEXT("GameOverScreen is NULL! Check UMG bindings."));
+        return;
     }
+
+    GameOverScreen->SetVisibility(ESlateVisibility::Visible);
+    UE_LOG(LogTemp, Warning, TEXT("Game Over UI Displayed"));
 }
 
 
 
-/// Quit 버튼 클릭 시 호출: 게임을 종료합니다.
-void USevenUserWidget::OnQuitButtonClicked()
-{
-    UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
-}
+
+// /// Quit 버튼 클릭 시 호출: 게임을 종료합니다.
+// void USevenUserWidget::OnQuitButtonClicked()
+// {
+//     UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+// }

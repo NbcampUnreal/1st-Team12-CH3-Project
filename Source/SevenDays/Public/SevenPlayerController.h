@@ -80,8 +80,6 @@ public:
     /** 현재 게임이 밤인지 여부 */
     bool bIsNight = false;
 
-
-
     /** 낮/밤 전환 입력 액션 */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
     UInputAction* ToggleDayNightAction;
@@ -98,11 +96,17 @@ public:
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateHealth(float HealthPercent);
 
+    /* 무기 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void UpdateWeaponUI(const FString& WeaponName, int32 CurrentAmmo, int32 MaxAmmo);
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void ChangeWeapon(EPlayerWeaponType NewWeaponType);
 
+
+    /* 좀비 */
     UFUNCTION()
     void UpdateZombieUI();
+
 
 
     /** 게임 UI (HUD) 표시 함수 */
