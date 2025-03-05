@@ -75,10 +75,22 @@ int32 UNBC_BaseGun::Shot( )
 			UE_LOG(LogTemp, Warning, TEXT("------- %s"), *HitResult.GetActor()->GetName());
 
 			ANBC_Zombie_Base_Character* Zombie = Cast<ANBC_Zombie_Base_Character>(HitResult.GetActor());
-			if (Zombie)
+
+			if (Zombie && HitResult.GetActor()->ActorHasTag("ZombieHead"))
 			{
+				//헤드샷 
 				//데미지 주는 함수 블로그 참조
-				UGameplayStatics::ApplyDamage(Zombie, 30, Zombie->GetInstigatorController(), Zombie, NULL);
+				UE_LOG(LogTemp, Warning, TEXT("-------------- HeadShot"));
+
+
+				UGameplayStatics::ApplyDamage(Zombie, FInfomation.Damage * 2, PlayerController, Player, UDamageType::StaticClass());
+			}
+			else if (Zombie)
+			{
+
+				UE_LOG(LogTemp, Warning, TEXT("-------------- Shot"));
+				//데미지 주는 함수 블로그 참조
+				UGameplayStatics::ApplyDamage(Zombie, FInfomation.Damage, PlayerController, Player, UDamageType::StaticClass());
 			}
 		}
 		else{
@@ -121,6 +133,7 @@ void UNBC_BaseGun::ReLoad()
 		FInfomation.BulletCount -= bullet;
 	}
 
+	UpdateWeaponUI();
 }
 
 //플레이어 지정 및 컨트롤러 지정 //액터로 지정했으면 어땟을까 건매니저
@@ -186,6 +199,8 @@ void UNBC_BaseGun::ChangeWeapon(EPlayerWeaponType type)
 	Type = type;
 }
 
+
+//무기 UI 초기화
 void UNBC_BaseGun::UpdateWeaponUI()
 {
 	ASevenPlayerController* controller =

@@ -16,11 +16,12 @@
 
 
 // Sets default values
-ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character():
-	ZombieStat(FNBC_ZombieStruct(100, 300, 10))
+ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character()	
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	ZombieStat = FNBC_ZombieStruct(100, 300, 10);
 
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
@@ -128,6 +129,13 @@ void ANBC_Zombie_Base_Character::ZombieAttack()
 		AActor* HitActor = HitResult.GetActor();
 		if (HitActor &&HitActor->ActorHasTag("Player"))
 		{	
+			UGameplayStatics::ApplyDamage(
+				HitActor				//타깃
+				, ZombieStat.Damage,	//데미지
+				GetController(),	//공격자의 컨트롤러라합니다.
+				this,			// 데미지를 가한 주체 설정
+				UDamageType::StaticClass()	// 기본 대미지 타입 설정
+			);
 			UE_LOG(LogTemp, Warning, TEXT("Hit Actor : %s"), *HitActor->GetName());
 		}
 	}

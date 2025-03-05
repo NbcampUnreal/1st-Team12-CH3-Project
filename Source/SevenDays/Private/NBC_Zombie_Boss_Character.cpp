@@ -7,6 +7,9 @@
 
 ANBC_Zombie_Boss_Character::ANBC_Zombie_Boss_Character()
 {
+	ZombieStat = FNBC_ZombieStruct(1500, 350, 25);
+		
+
 	if (USkeletalMeshComponent* skel = GetMesh())
 	{
 		SpitPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("Spit_Point"));
