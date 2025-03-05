@@ -128,6 +128,7 @@ void ANBC_Zombie_Base_Character::ZombieAttack()
 		AActor* HitActor = HitResult.GetActor();
 		if (HitActor &&HitActor->ActorHasTag("Player"))
 		{
+			UGameplayStatics::ApplyDamage(HitActor,ZombieStat.Damage, Event)
 			UE_LOG(LogTemp, Warning, TEXT("Hit Actor : %s"), *HitActor->GetName());
 		}
 	}

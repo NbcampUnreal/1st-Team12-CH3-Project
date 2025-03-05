@@ -15,13 +15,13 @@ UNBC_BaseGun::UNBC_BaseGun()
 		.SetShotDelay(0.1f)
 		.SetDamage(25)
 		.SetMaxRecoil(2.0f, 5.0f)
-		.SetBulletInfo(30, 150);
+		.SetBulletInfo(6, 30);
 
 	FRifle.SetReloadDelay(1.0f)
 		.SetShotDelay(2.0f)
 		.SetDamage(20)
 		.SetMaxRecoil(1.5f, 4.0f)
-		.SetBulletInfo(6, 30);
+		.SetBulletInfo(30, 150);
 
 	FInfomation = FRifle;
 
@@ -72,12 +72,18 @@ int32 UNBC_BaseGun::Shot( )
 
 		if (bHit)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("------- %s"), *HitResult.GetActor()->GetName());
+
 			ANBC_Zombie_Base_Character* Zombie = Cast<ANBC_Zombie_Base_Character>(HitResult.GetActor());
 			if (Zombie)
 			{
 				//데미지 주는 함수 블로그 참조
 				UGameplayStatics::ApplyDamage(Zombie, 30, Zombie->GetInstigatorController(), Zombie, NULL);
 			}
+		}
+		else{
+			UE_LOG(LogTemp, Warning, TEXT("-------------- NonTarget"));
+
 		}
 	}
 
@@ -142,10 +148,7 @@ void UNBC_BaseGun::ApplyRecoli()
 
 //발사 
 void UNBC_BaseGun::Fire()
-{
-	if (FInfomation.CurrentBullet <= 0)
-		return;
-
+{	
 	Shot();
 	ApplyRecoli();
 
@@ -187,6 +190,6 @@ void UNBC_BaseGun::UpdateWeaponUI()
 {
 	ASevenPlayerController* controller =
 		Cast<ASevenPlayerController>(PlayerController);
-	controller->CurrentWidget->UpdateWeaponUI(TEXT("{0}", FInfomation.Name), FInfomation.CurrentBullet, FInfomation.BulletCount);
+	controller->CurrentWidget->UpdateWeaponUI((TEXT("{0}"), FInfomation.Name), FInfomation.CurrentBullet, FInfomation.BulletCount);
 }
 

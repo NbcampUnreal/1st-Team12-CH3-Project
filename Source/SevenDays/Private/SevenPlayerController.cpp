@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/Engine.h"
+#include "PlayerCharacter.h"
 
 /** 생성자 */
 ASevenPlayerController::ASevenPlayerController()
@@ -197,7 +198,8 @@ void ASevenPlayerController::ChangeWeapon(EPlayerWeaponType NewWeaponType)
   //      UpdateWeaponUI(WeaponName, CurrentAmmo, ReserveAmmo);
   //  }
   //
-    UpdateWeaponUI(WeaponName, 30, 120); // 예제 값 (AR 기준)
+    
+    //UpdateWeaponUI(WeaponName, 30, 120); // 예제 값 (AR 기준)
 }
 
 

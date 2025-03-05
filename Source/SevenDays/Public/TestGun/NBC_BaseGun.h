@@ -139,7 +139,7 @@ protected:
 
 	//---- 총 ----
 	//총 정보 담긴 구조체 참조값 // 포인터에서 교체함.
-	FGunInformation& FInfomation = FPistol;
+	FGunInformation& FInfomation = FRifle;
 	
 	//총 정보
 	FGunInformation FRifle;
