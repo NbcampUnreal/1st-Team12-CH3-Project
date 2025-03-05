@@ -63,6 +63,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float MaxHealth = 100.0f;
 
+	UFUNCTION()
+	void SupplyARBullet();
+
 protected:
 	//테스트용
 	//TODO: 나중에 불필요시 제거
@@ -118,7 +121,7 @@ protected:
 
 	//총기
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|Gun")
-	UNBC_BaseGun* Current_Weapon;
+	UNBC_BaseGun* WeaponInfo;
 	//총기 끝
 
 	//애니메이션

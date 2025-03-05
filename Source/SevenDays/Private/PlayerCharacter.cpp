@@ -39,7 +39,7 @@ APlayerCharacter::APlayerCharacter()
 	FPSMeshComponent->bCastDynamicShadow = false;
 	FPSMeshComponent->bCastStaticShadow = false;
 	
-	Current_Weapon = NewObject<UNBC_BaseGun>();
+	WeaponInfo = NewObject<UNBC_BaseGun>();
 
 	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponComponent"));
 	WeaponComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
@@ -70,7 +70,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Current_Weapon->SetPlayer(UGameplayStatics::GetPlayerPawn(GetWorld(), 0), GetWorld()->GetFirstPlayerController());
+	WeaponInfo->SetPlayer(UGameplayStatics::GetPlayerPawn(GetWorld(), 0), GetWorld()->GetFirstPlayerController());
 	GetWorldTimerManager().SetTimer(RecoilTimerHandle, this, &APlayerCharacter::ReduceRecoil, 0.1f, true);
 
 	ArmsAnimInstance = FPSMeshComponent->GetAnimInstance();
@@ -151,6 +151,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		}
 	}
+}
+
+void APlayerCharacter::SupplyARBullet()
+{
+	//Åº ¹è±Þ
 }
 
 void APlayerCharacter::Move(const FInputActionValue& _Value)
@@ -254,7 +259,7 @@ void APlayerCharacter::Fire(const FInputActionValue& _Value)
 			if (Current_LeftBullet > 0)
 			{
 				ArmsAnimInstance->Montage_Play(FireMontage);
-				Current_Weapon->Fire();
+				WeaponInfo->Fire();
 				Current_LeftBullet--;
 
 				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
@@ -550,5 +555,5 @@ void APlayerCharacter::EnableWalkSound()
 
 void APlayerCharacter::ReduceRecoil()
 {
-	Current_Weapon->ReCoilDelayReduction();
+	WeaponInfo->ReCoilDelayReduction();
 }
