@@ -5,9 +5,7 @@
 #include "DayNightManager.h"
 #include "NBC_SpawnManager.h"
 #include "MiniGameAvoid.h"  
-#include "UObject/ObjectMacros.h" 
-#include "UObject/ScriptMacros.h" 
-
+#include "Blueprint/UserWidget.h"
 #include "SevenGameModeBase.generated.h"
 
 
@@ -28,8 +26,6 @@ public:
     ASevenGameModeBase();
 
     /** 미니게임 완료 후 밤 시작*/
-
-  
     void OnMiniGameCompleted();
 
     /** 웨이브 시작 */
@@ -50,8 +46,8 @@ public:
 
     /** 미니게임 시작 */
     void StartMiniGame();
-
-    /** 미니게임 종료 후 FPS 본 게임 시작 */
+  
+  /** 미니게임 종료 후 FPS 본 게임 시작 */
     void EndMiniGame();
 
 
@@ -60,6 +56,8 @@ public:
 
 protected:
     virtual void BeginPlay() override;
+    virtual void StartPlay() override;
+
    
 
     /** 낮 시작 */
@@ -103,15 +101,15 @@ protected:
 
 
 private:
-
+    
     /** 미니게임 위젯 클래스 */
     UPROPERTY(EditDefaultsOnly, Category = "MiniGame")
     TSubclassOf<UMiniGameAvoid> MiniGameClass;
-
+    
     /** 미니게임 위젯 인스턴스 */
     UPROPERTY()
     UMiniGameAvoid* MiniGameInstance;
-
+    
 
 
 public:
