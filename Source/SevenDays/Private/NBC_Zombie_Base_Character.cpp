@@ -21,7 +21,7 @@ ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ZombieStat = FNBC_ZombieStruct(100, 300, 10);
+	ZombieStat = FNBC_ZombieStruct(100, 300, 10,50);
 
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
@@ -78,7 +78,11 @@ float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent co
 
 	//피격시 스피드를 느리게 해주기 //
 	
-	ZombieStat.CurrentHp -= DamageAmount;
+	//방어력이 높아질수록 피해 감소 (백분율)
+	float DamageMultiplier = 1.0f - (ZombieStat.Defense / (ZombieStat.Defense + 100.0f));
+	float Damage = DamageAmount * DamageMultiplier;
+
+	ZombieStat.CurrentHp -= Damage;
 
 	if (GetWorldTimerManager().IsTimerActive(SlowDelayTimer))
 	{
