@@ -56,7 +56,7 @@ void USevenUserWidget::NativeConstruct()
 
     // 기본 UI 값 설정
     ZombiesText->SetText(FText::FromString(TEXT("0 / 0")));
-    UpdateAmmo(0, 0);
+    //UpdateAmmo(0, 0);
     UpdateDayNightCycle(false);
 
 }
@@ -82,14 +82,14 @@ void USevenUserWidget::UpdateHealth(float HealthPercent)
 }
 
 
-
 /// 무기 UI 업데이트
 void USevenUserWidget::UpdateWeaponUI(const FString& WeaponName, int32 CurrentAmmo, int32 MaxAmmo)
 {
     UpdateWeaponName(WeaponName);  // 무기 이름 업데이트
     UpdateAmmo(CurrentAmmo, MaxAmmo);  // 탄약 정보 업데이트
 
-    UE_LOG(LogTemp, Warning, TEXT("Weapon UI Updated: %s, %d / %d"), *WeaponName, CurrentAmmo, MaxAmmo);
+    UE_LOG(LogTemp, Warning, TEXT("Weapon UI Updated: %d / %d") , CurrentAmmo, MaxAmmo);
+    //UE_LOG(LogTemp, Warning, TEXT("Weapon UI Updated: %s, %d / %d"), *WeaponName, CurrentAmmo, MaxAmmo);
 }
 
 
