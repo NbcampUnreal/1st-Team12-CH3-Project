@@ -11,12 +11,14 @@ ANBC_SpawnManager::ANBC_SpawnManager()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	SpawnPoint = nullptr;
 	SetRef(FName(TEXT("BaseZombie")));	
+
+	SetSpawnPoint(0);
 	
 }
 
-void ANBC_SpawnManager::SummonEnemy(const FVector SpawnPoint)
+void ANBC_SpawnManager::SummonEnemy(const FVector Point)
 {
 	AActor* ResultPawn = nullptr;
 
@@ -50,7 +52,7 @@ void ANBC_SpawnManager::SummonEnemy(const FVector SpawnPoint)
 
 		//소환 코드
 		ResultPawn = GetWorld()->SpawnActor<AActor>(ZombieClass,
-			SpawnPoint,
+			Point,
 			FRotator::ZeroRotator,
 			SpawnParams);
 
@@ -75,6 +77,14 @@ void ANBC_SpawnManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ANBC_SpawnManager::SetSpawnPoint(int32 Point)
+{
+	if (SpawnPointArray.IsValidIndex(Point))
+	{
+		SpawnPoint = SpawnPointArray[Point];
+	}
 }
 
 void ANBC_SpawnManager::SetRef(const FName& RowName)
@@ -119,13 +129,20 @@ void ANBC_SpawnManager::SetRef(const FName& RowName)
 //}
 
 // ---------- 좀비 생성 코드 -----------------
-void ANBC_SpawnManager::CreateZombie(int32 count, const FVector SpawnPoint)
+void ANBC_SpawnManager::CreateZombie(int32 count, const FVector Point)
 {
 	SetRef(FName(TEXT("BaseZombie")));
 
 	for (int32 i = 0; i < count; i++)
 	{
-		SummonEnemy(SpawnPoint);
+		if (this->SpawnPoint)
+		{
+			SummonEnemy(this->SpawnPoint->GetActorLocation());
+		}
+		else {
+			SummonEnemy(Point);
+
+		}
 	}
 }
 
@@ -138,16 +155,16 @@ void ANBC_SpawnManager::ClearZombie()
 		{
 			Zombie->Destroy();
 		}
-		/*ZombieArr[i]->SetActorEnableCollision(false);
-		ZombieArr[i]->SetActorHiddenInGame(true);*/
+		//ZombieArr[i]->SetActorEnableCollision(false);
+		//ZombieArr[i]->SetActorHiddenInGame(true)
 		//TArry로 관리되는데 메모리 삭제 시킬지 생각중
 	}
 	ZombieArr.Empty();
 }
 
-void ANBC_SpawnManager::CreateBoss(const FVector SpawnPoint)
+void ANBC_SpawnManager::CreateBoss(const FVector Point)
 {
 	SetRef(FName(TEXT("BossZombie")));
-	SummonEnemy(SpawnPoint);
+	SummonEnemy(Point);
 }
 

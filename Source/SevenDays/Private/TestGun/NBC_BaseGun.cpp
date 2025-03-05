@@ -76,7 +76,8 @@ int32 UNBC_BaseGun::Shot( )
 
 			ANBC_Zombie_Base_Character* Zombie = Cast<ANBC_Zombie_Base_Character>(HitResult.GetActor());
 
-			if (Zombie && HitResult.GetActor()->ActorHasTag("ZombieHead"))
+			//HitResult.GetActor()->ActorHasTag("ZombieHead")
+			if (Zombie && HitResult.BoneName == FName("Head")) // 머리 맞았는지 확인
 			{
 				//헤드샷 
 				//데미지 주는 함수 블로그 참조

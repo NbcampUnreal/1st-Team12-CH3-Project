@@ -44,6 +44,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZOMBIE")
 	TSoftClassPtr<AActor> LoadRefClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
+	TArray<AActor*> SpawnPointArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
+	AActor* SpawnPoint;
+
+	//스폰 포인트 위치 정하기
+	void SetSpawnPoint(int32 Point);
+
 
 	//-------------------- 비동기로 불러온 클래스 저장용!!!---------------------
 	//  로드된 클래스 저장 (필요할 때 스폰하기 위해)

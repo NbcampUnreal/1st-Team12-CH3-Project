@@ -33,18 +33,22 @@ struct FNBC_ZombieStruct
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Damage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Defense;
+
 	// 持失切
 	FNBC_ZombieStruct()
-		: CurrentHp(100), MaxHp(100), NormalSpeed(200.f), BoostSpeed(240.f), Damage(10) 
+		: CurrentHp(100), MaxHp(100), NormalSpeed(200.f), BoostSpeed(240.f), Damage(10) , Defense(0)
 	{
 	}
 
 
 	// 竺舛 持失切
-	FNBC_ZombieStruct(int32 Hp, float Speed, int32 damage) : 
+	FNBC_ZombieStruct(int32 Hp, float Speed, int32 damage,int32 defence) : 
 		MaxHp(Hp) , 
 		NormalSpeed(Speed),
-		Damage(damage)
+		Damage(damage),
+		Defense(defence)
 	{
 		CurrentHp = MaxHp;
 		BoostSpeed = NormalSpeed * 1.2f;
