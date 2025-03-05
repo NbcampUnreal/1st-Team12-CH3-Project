@@ -201,31 +201,3 @@ void ASevenPlayerController::ChangeWeapon(EPlayerWeaponType NewWeaponType)
     
     //UpdateWeaponUI(WeaponName, 30, 120); // 예제 값 (AR 기준)
 }
-
-
-
-/** 체력 UI 업데이트 함수
- *  체력 비율에 따라 HUD UI의 체력 정보를 업데이트하며, 체력이 0 이하일 경우 게임 오버 화면을 표시합니다.
- */
-void ASevenPlayerController::UpdateHealth(float HealthPercent)
-{
-    if (CurrentWidget)
-    {
-        CurrentWidget->UpdateHealth(HealthPercent);
-        UE_LOG(LogTemp, Warning, TEXT("Health Updated: %d%%"), static_cast<int32>(HealthPercent * 100));
-
-        if (HealthPercent <= 0.0f)
-        {
-            ShowGameOverScreen();
-        }
-    }
-}
-
-/** 게임 오버 화면 표시 함수 */
-void ASevenPlayerController::ShowGameOverScreen()
-{
-    if (CurrentWidget)
-    {
-        CurrentWidget->ShowGameOverUI();
-    }
-}

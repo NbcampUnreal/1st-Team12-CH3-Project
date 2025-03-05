@@ -46,7 +46,13 @@ public:
 	UCameraComponent* CameraComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
-	USkeletalMeshComponent* WeaponComponent;
+	USkeletalMeshComponent* RifleComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+	USkeletalMeshComponent* PistolComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+	USkeletalMeshComponent* GrenadeComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float Health = 100.0f;

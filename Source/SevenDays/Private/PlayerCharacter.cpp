@@ -41,8 +41,11 @@ APlayerCharacter::APlayerCharacter()
 	
 	Current_Weapon = NewObject<UNBC_BaseGun>();
 
-	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponComponent"));
-	WeaponComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
+	RifleComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RifleComponent"));
+	RifleComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
+
+	PistolComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PistolComponent"));
+	PistolComponent->SetupAttachment(FPSMeshComponent, TEXT("pistol_socket"));
 
 	bMoveSoundInterval = true;
 
@@ -239,13 +242,25 @@ void APlayerCharacter::Fire(const FInputActionValue& _Value)
 				ArmsAnimInstance->Montage_Play(FireMontage);
 				Current_Weapon->Fire();
 				Current_LeftBullet--;
+
 				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+				if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+				{
+					if (ASevenPlayerController* SPC = Cast<ASevenPlayerController>(PC))
+					{
+						if (USevenUserWidget* SUW = SPC->CurrentWidget)
+						{
+							SUW->UpdateAmmo(Current_LeftBullet, Current_MaxBullet);
+						}
+					}
+				}
 			}
 			else
 			{
 				bIsBulletEmpty = true;
 				UGameplayStatics::PlaySoundAtLocation(this, EmptyBulletSound, GetActorLocation());
 			}
+
 		}
 	}
 }
@@ -388,9 +403,16 @@ void APlayerCharacter::SaveWeaponInfo()
 
 void APlayerCharacter::OnDeath()
 {
-	// 카메라 래그돌로 해서 뚝 떨구는 연출 넣어보기
-	bIsChangingWeapon = true;
-	UE_LOG(LogTemp, Warning, TEXT("OnDeath"));
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		if (ASevenPlayerController* SPC = Cast<ASevenPlayerController>(PC))
+		{
+			if (USevenUserWidget* SUW = SPC->CurrentWidget)
+			{
+				SUW->ShowGameOverUI();
+			}
+		}
+	}
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -398,6 +420,17 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		if (ASevenPlayerController* SPC = Cast<ASevenPlayerController>(PC))
+		{
+			if (USevenUserWidget* SUW = SPC->CurrentWidget)
+			{
+				SUW->UpdateHealth(Health / MaxHealth);
+			}
+		}
+	}
 
 	if (Health <= 0.0f)
 	{
@@ -421,6 +454,18 @@ void APlayerCharacter::CompleteReloading()
 	bIsBulletEmpty = false;
 	UGameplayStatics::PlaySoundAtLocation(this, CompleteReloadSound, GetActorLocation());
 	Current_LeftBullet = Current_MaxBullet;
+
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		if (ASevenPlayerController* SPC = Cast<ASevenPlayerController>(PC))
+		{
+			if (USevenUserWidget* SUW = SPC->CurrentWidget)
+			{
+				SUW->UpdateAmmo(Current_LeftBullet, Current_MaxBullet);
+			}
+		}
+	}
+
 }
 
 void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
@@ -444,6 +489,11 @@ void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
 					Current_LeftBullet = AR_CurrentBullet;
 					Current_MaxBullet = AR_MaxBullet;
 					SUW->UpdateWeaponUI((TEXT("Assault Rifle")), Current_LeftBullet, Current_MaxBullet);
+					FPSMeshComponent->bHiddenInGame = false;
+					RifleComponent->bHiddenInGame = false;
+					PistolComponent->bHiddenInGame = true;
+					GrenadeComponent->bHiddenInGame = true;
+
 					break;
 				case EPlayerWeaponType::Pistol:
 					Current_reloadTime = HG_ReloadTime;
@@ -451,6 +501,11 @@ void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
 					Current_LeftBullet = HG_CurrentBullet;
 					Current_MaxBullet = HG_MaxBullet;
 					SUW->UpdateWeaponUI((TEXT("Pistol")), Current_LeftBullet, Current_MaxBullet);
+					FPSMeshComponent->bHiddenInGame = true;
+					RifleComponent->bHiddenInGame = true;
+					PistolComponent->bHiddenInGame = false;
+					GrenadeComponent->bHiddenInGame = true;
+
 					break;
 				case EPlayerWeaponType::Grenade:
 					Current_reloadTime = GL_ReloadTime;
@@ -458,10 +513,16 @@ void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
 					Current_LeftBullet = GL_CurrentBullet;
 					Current_MaxBullet = GL_MaxBullet;
 					SUW->UpdateWeaponUI((TEXT("Grenade")), Current_LeftBullet, Current_MaxBullet);
+					FPSMeshComponent->bHiddenInGame = false;
+					RifleComponent->bHiddenInGame = true;
+					PistolComponent->bHiddenInGame = true;
+					GrenadeComponent->bHiddenInGame = false;
 					break;
 				}
 
 				SUW->UpdateWeaponIcons(_EType); // 선택된 무기 아이콘 업데이트
+
+				SUW->UpdateAmmo(Current_LeftBullet, Current_MaxBullet);
 			}
 		}
 	}

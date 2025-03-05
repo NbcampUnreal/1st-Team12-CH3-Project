@@ -92,10 +92,6 @@ public:
     UPROPERTY(BlueprintReadOnly, Category = "UI")
     USevenUserWidget* CurrentWidget;
 
-    /** 체력 UI 업데이트 함수 */
-    UFUNCTION(BlueprintCallable, Category = "HUD")
-    void UpdateHealth(float HealthPercent);
-
     /* 무기 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void UpdateWeaponUI(const FString& WeaponName, int32 CurrentAmmo, int32 MaxAmmo);
@@ -113,7 +109,4 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ShowGameUI();
 
-
-    /** 게임 오버 UI 표시 함수 */
-    void ShowGameOverScreen();
 };
