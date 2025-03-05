@@ -48,6 +48,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
 	USkeletalMeshComponent* WeaponComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+	USkeletalMesh* RifleMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+	USkeletalMesh* PistolMesh;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float Health = 100.0f;
 
@@ -140,12 +146,6 @@ protected:
 	USoundBase* WalkSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
 	USoundBase* SprintSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
-	USoundBase* LandSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
-	USoundBase* DeathSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound Effcts")
-	USoundBase* HitSound;
 	//사운드 끝
 
 	UFUNCTION()

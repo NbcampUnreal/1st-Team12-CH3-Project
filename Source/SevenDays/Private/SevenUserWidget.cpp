@@ -73,12 +73,6 @@ void USevenUserWidget::UpdateHealth(float HealthPercent)
     HealthText->SetText(FText::AsNumber(static_cast<int32>(HealthPercent * 100)));
 
     UE_LOG(LogTemp, Log, TEXT("[SevenUserWidget] Health Updated: %d%%"), static_cast<int32>(HealthPercent * 100));
-
-    // 체력이 0일 때 게임 오버 UI 표시
-    if (HealthPercent <= 0.0f)
-    {
-        ShowGameOverUI();
-    }
 }
 
 
@@ -89,7 +83,6 @@ void USevenUserWidget::UpdateWeaponUI(const FString& WeaponName, int32 CurrentAm
     UpdateAmmo(CurrentAmmo, MaxAmmo);  // 탄약 정보 업데이트
 
     UE_LOG(LogTemp, Warning, TEXT("Weapon UI Updated: %d / %d") , CurrentAmmo, MaxAmmo);
-    //UE_LOG(LogTemp, Warning, TEXT("Weapon UI Updated: %s, %d / %d"), *WeaponName, CurrentAmmo, MaxAmmo);
 }
 
 
