@@ -55,6 +55,11 @@ APlayerCharacter::APlayerCharacter()
 	{
 		PistolMesh = PistolMeshAsset.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> GLMeshAsset(TEXT("/Game/MilitaryWeapDark/Weapons/Grenade_Launcher_B.Grenade_Launcher_B"));
+	if(GLMeshAsset.Succeeded())
+	{
+		LauncherMesh = GLMeshAsset.Object;
+	}
 
 	bMoveSoundInterval = true;
 
@@ -524,6 +529,8 @@ void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
 					Current_MaxBullet = GL_MaxBullet;
 					SUW->UpdateWeaponUI((TEXT("Grenade")), Current_LeftBullet, Current_MaxBullet);
 					FPSMeshComponent->SetHiddenInGame(false);
+					WeaponComponent->SetRelativeLocation(FVector(0, 0, 0));
+					WeaponComponent->SetSkeletalMesh(LauncherMesh);
 					break;
 				}
 

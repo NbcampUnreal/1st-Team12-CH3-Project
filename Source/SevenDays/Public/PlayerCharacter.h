@@ -54,6 +54,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
 	USkeletalMesh* PistolMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+	USkeletalMesh* LauncherMesh;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float Health = 100.0f;
 
