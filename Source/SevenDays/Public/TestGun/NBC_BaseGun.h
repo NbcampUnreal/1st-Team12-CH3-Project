@@ -145,22 +145,9 @@ protected:
 	FGunInformation FRifle;
 	FGunInformation FPistol;
 
-	
 	EPlayerWeaponType Type;
 
-
 	void ChangeWeapon(EPlayerWeaponType type);
-
-	//총마다 바뀔수 있음.
-	//함수를 만들어서 자식클래스 용량 줄여볼 것 // 이라 하려했는데 상수라
-	//const float fReloadDelay = 1.0f;
-	//const float fShotDelay = 0.2f;
-	//const int32 Damage = 30;
-	//const float fMaxShotReCoilX = 1.5f;
-	//const float fMaxShotReCoilY = 5.0f;
-	////총알 최대 갯수
-	//const int32 BulletMaxCount = 120;
-		
 
 	float ShotReCoilX;
 	float ShotReCoilY;
