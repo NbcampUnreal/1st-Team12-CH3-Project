@@ -47,7 +47,7 @@ void ANBC_Zombie_Base_Character::BeginPlay()
 
 	if (GetWorldTimerManager().IsTimerActive(SoundTimer) == false)
 	{
-		GetWorldTimerManager().SetTimer(SoundTimer, this, &ANBC_Zombie_Base_Character::PlaySound, 3, true);
+		GetWorldTimerManager().SetTimer(SoundTimer, this, &ANBC_Zombie_Base_Character::PlaySound, 2, true);
 	}
 	
 }
@@ -56,7 +56,6 @@ void ANBC_Zombie_Base_Character::BeginPlay()
 void ANBC_Zombie_Base_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ANBC_Zombie_Base_Character::SetActorHiddenInGame(bool bNewHidden)
@@ -212,7 +211,7 @@ void ANBC_Zombie_Base_Character::PlaySound()
 {
 	if (ZombieSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ZombieSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, ZombieSound, GetActorLocation() , 0.3f);
 	}
 }
 
