@@ -178,6 +178,14 @@ void ANBC_Zombie_Base_Character::Death()
 			//점수 추가시 코드 넣어 줄 곳.
 
 		}
+
+		// 킬확정 추가
+		ASevenGameModeBase* GameMode = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (GameMode)
+		{
+			GameMode->OnEnemyKilled();  // <-- 여기 추가!
+		}
+
 		
 		// 남은 좀비 수 업데이트
 		ASevenGameStateBase* SevenGS = Cast<ASevenGameStateBase>(UGameplayStatics::GetGameState(this));
