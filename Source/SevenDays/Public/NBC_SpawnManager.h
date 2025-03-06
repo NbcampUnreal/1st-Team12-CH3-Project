@@ -50,9 +50,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
 	AActor* SpawnPoint;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
+	TArray<AActor*> PlayerSpawnPointArray;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
+	AActor* PlayerSpawnPoint;
+
 	UFUNCTION(BlueprintCallable)
 	//스폰 포인트 위치 정하기
 	void SetSpawnPoint(int32 Point);
+
+	void SetPlayerSpawnPoint(int32 Point);
 
 
 	//-------------------- 비동기로 불러온 클래스 저장용!!!---------------------

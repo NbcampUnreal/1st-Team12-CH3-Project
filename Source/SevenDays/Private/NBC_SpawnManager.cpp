@@ -90,6 +90,14 @@ void ANBC_SpawnManager::SetSpawnPoint(int32 Point)
 	}
 }
 
+void ANBC_SpawnManager::SetPlayerSpawnPoint(int32 Point)
+{
+	if (PlayerSpawnPointArray.IsValidIndex(Point))
+	{
+		PlayerSpawnPoint = PlayerSpawnPointArray[Point];
+	}
+}
+
 void ANBC_SpawnManager::SetRef(const FName& RowName)
 {
 

@@ -17,8 +17,9 @@ ANBC_ThrowActor::ANBC_ThrowActor()
 	SetRootComponent(Collision);
 
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Collision->SetCollisionResponseToAllChannels(ECR_Block); // 모든 채널에 충돌
-	Collision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block); //Pawn 채널에 대해
+	Collision->SetCollisionResponseToAllChannels(ECR_Block);
+	Collision->SetNotifyRigidBodyCollision(true);
+
 
 	// 메시 컴포넌트 설정
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
@@ -62,7 +63,7 @@ void ANBC_ThrowActor::Tick(float DeltaTime)
 	LaunchVelocity += Gravity * DeltaTime;
 	NewLocation.Z += LaunchVelocity.Z * DeltaTime;
 
-	SetActorLocation(NewLocation);
+	SetActorLocation(NewLocation, true);
 }
 
 void ANBC_ThrowActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
