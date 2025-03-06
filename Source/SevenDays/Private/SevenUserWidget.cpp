@@ -4,6 +4,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
 #include "Engine/Engine.h"
+
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -29,13 +30,13 @@ void USevenUserWidget::NativeConstruct()
    // {
    //     QuitButton->OnClicked.AddDynamic(this, &USevenUserWidget::OnQuitButtonClicked);
    // }
-
-    // 게임 오버 UI = Hidden
-    if (GameOverScreen)
-    {
-        GameOverScreen->SetVisibility(ESlateVisibility::Hidden);
-    }
-
+   
+     // 게임 오버 UI = Hidden
+     if (GameOverWidget)
+     {
+         GameOverWidget->SetVisibility(ESlateVisibility::Hidden);
+     }
+   
     // UI 요소
     bool bAllWidgetsValid = true;
     if (!EnsureWidget(HealthBar, "HealthBar")) bAllWidgetsValid = false;
@@ -172,16 +173,18 @@ void USevenUserWidget::UpdateDayNightCycle(bool bIsNight)
 /// ShowGameOverUI
 void USevenUserWidget::ShowGameOverUI()
 {
-    if (!GameOverScreen)
+    if (GameOverWidget) return;  // 이미 UI가 있으면 생성하지 않음
+
+    if (GameOverWidgetClass)  // 클래스가 올바르게 설정되어 있는지 확인
     {
-        UE_LOG(LogTemp, Error, TEXT("GameOverScreen is NULL! Check UMG bindings."));
-        return;
+        GameOverWidget = CreateWidget<UGameOverWidget>(GetWorld(), GameOverWidgetClass);
+
+        if (GameOverWidget)
+        {
+            GameOverWidget->AddToViewport(999);
+        }
     }
-
-    GameOverScreen->SetVisibility(ESlateVisibility::Visible);
-    UE_LOG(LogTemp, Warning, TEXT("Game Over UI Displayed"));
 }
-
 
 
 

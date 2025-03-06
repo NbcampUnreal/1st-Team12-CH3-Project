@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "Components/Button.h"
 #include "SevenPlayerController.h"
+#include "GameOverWidget.h"
 #include "SevenUserWidget.generated.h"
 
 
@@ -50,10 +51,13 @@ public:
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateHealth(float HealthPercent);
 
+ 
+
     /** 게임 오버 UI 표시 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ShowGameOverUI();
 
+ 
 protected:
     /** UI 요소가 올바르게 바인딩되었는지 확인 */
     bool EnsureWidget(UWidget* Widget, const FString& WidgetName);
@@ -82,8 +86,15 @@ protected:
     UPROPERTY(meta = (BindWidget)) UTextBlock* ZombiesText;
 
     /** 게임 오버 UI */
-    UPROPERTY(meta = (BindWidget))
-    UWidget* GameOverScreen;
+ //  UPROPERTY(meta = (BindWidget))
+ //  UWidget* GameOverScreen;
+ //
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<class UGameOverWidget> GameOverWidgetClass;
+
+    UPROPERTY()
+    UGameOverWidget* GameOverWidget;
+
 
    // /** Quit 버튼 */
    // UPROPERTY(meta = (BindWidget))
