@@ -32,7 +32,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CreateBoss(const FVector SpawnPoint);
 
+	UFUNCTION(BlueprintCallable)
+	//스폰 포인트 위치 정하기
+	void SetSpawnPoint(int32 Point);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
+	TArray<AActor*> PlayerSpawnPointArray;
 
 protected:
 	// Called when the game starts or when spawned
@@ -50,15 +55,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
 	AActor* SpawnPoint;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
-	TArray<AActor*> PlayerSpawnPointArray;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
 	AActor* PlayerSpawnPoint;
 
-	UFUNCTION(BlueprintCallable)
-	//스폰 포인트 위치 정하기
-	void SetSpawnPoint(int32 Point);
+	
 
 	void SetPlayerSpawnPoint(int32 Point);
 
