@@ -205,6 +205,13 @@ void UNBC_BaseGun::ChangeWeapon(EPlayerWeaponType type)
 	Type = type;
 }
 
+void UNBC_BaseGun::AddMaxBullet(int32 AddBullet)
+{
+	FRifle.BulletCount += AddBullet;
+
+	UpdateWeaponUI();
+}
+
 
 //무기 UI 초기화
 void UNBC_BaseGun::UpdateWeaponUI()

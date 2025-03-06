@@ -6,6 +6,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "SevenGameModeBase.h"
+#include "PlayerCharacter.h"
 
 
 
@@ -242,6 +243,11 @@ void UMiniGameAvoid::EndGame()
        }
     }
 
+    if (APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+    {
+        Player->SupplyARBullet(ClickedObstacles);
+    }
+
 }
 
 void UMiniGameAvoid::ExitMiniGame()
@@ -257,6 +263,7 @@ void UMiniGameAvoid::ExitMiniGame()
         PC->SetInputMode(FInputModeGameOnly());  // 본 게임 입력 모드로 변경
         PC->SetShowMouseCursor(false);          // 마우스 숨김
     }
+
 
     RemoveFromParent();  // UI 제거
 }

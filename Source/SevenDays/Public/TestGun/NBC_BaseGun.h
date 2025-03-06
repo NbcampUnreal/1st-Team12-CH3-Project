@@ -136,6 +136,8 @@ public:
 
 	int32 GetCurrentBullet() const { return FInfomation.CurrentBullet; };
 
+	void AddMaxBullet(int32 AddBullet);
+
 protected:
 
 	AActor* Player;

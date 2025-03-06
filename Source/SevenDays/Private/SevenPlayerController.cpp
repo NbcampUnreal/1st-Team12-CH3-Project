@@ -165,39 +165,3 @@ void ASevenPlayerController::ShowGameUI()
     //  여기서 입력 바인딩 다시 실행
     SetupInputComponent();
 }
-
-
-// 무기 변경 
-void ASevenPlayerController::ChangeWeapon(EPlayerWeaponType NewWeaponType)
-{
-    CurrentWeaponType = NewWeaponType;
-
-    // 무기 이름 매핑 (UI 업데이트용)
-    FString WeaponName;
-    switch (CurrentWeaponType)
-    {
-    case EPlayerWeaponType::AR:
-        WeaponName = TEXT("Assault Rifle");
-        break;
-    case EPlayerWeaponType::Pistol:
-        WeaponName = TEXT("Pistol");
-        break;
-    case EPlayerWeaponType::Grenade:
-        WeaponName = TEXT("Grenade");
-        break;
-    }
-
-    //무기 참조
-  //   APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
-  //  if (PlayerCharacter)
-  //  {
-  //      int32 CurrentAmmo = PlayerCharacter->GetCurrentAmmo();
-  //      int32 ReserveAmmo = PlayerCharacter->GetReserveAmmo();
-  //
-  //      // 실제 총기 탄약 정보로 UI 업데이트
-  //      UpdateWeaponUI(WeaponName, CurrentAmmo, ReserveAmmo);
-  //  }
-  //
-    
-    //UpdateWeaponUI(WeaponName, 30, 120); // 예제 값 (AR 기준)
-}

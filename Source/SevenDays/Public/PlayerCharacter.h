@@ -206,7 +206,6 @@ protected:
 
 
 	FTimerHandle MoveSoundTimerHandle; // 이동 중 소리 겹치지 않게 하기 위한 지연시간
-	void SaveWeaponInfo();
 
 	void OnDeath(); //죽었을 때
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override; //데미지를 받았을 때

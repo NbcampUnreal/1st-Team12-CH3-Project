@@ -162,6 +162,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 
 void APlayerCharacter::SupplyARBullet(int _addBullet)
 {
+	WeaponInfo->AddMaxBullet(_addBullet);
 }
 
 void APlayerCharacter::Move(const FInputActionValue& _Value)
