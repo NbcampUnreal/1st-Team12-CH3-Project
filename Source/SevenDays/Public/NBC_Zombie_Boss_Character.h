@@ -8,6 +8,8 @@
 #include "NBC_Zombie_Boss_Character.generated.h"
 
 
+class ANBC_ThrowActor;
+
 UCLASS()
 class SEVENDAYS_API ANBC_Zombie_Boss_Character : public ANBC_Zombie_Base_Character
 {
@@ -16,7 +18,8 @@ class SEVENDAYS_API ANBC_Zombie_Boss_Character : public ANBC_Zombie_Base_Charact
 public:
 	ANBC_Zombie_Boss_Character();
 
-protected:
+
+protected:	
 
 	virtual void PostInitializeComponents() override;
 
@@ -24,15 +27,22 @@ protected:
 
 	virtual void PossessedBy(AController* NewController);
 
+	UFUNCTION(BlueprintCallable)
+	void FireProject();
+
 	//애니메이션 인스턴스 (보스용)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ANIM")
 	UZombieBossAnimInstance* AnimInstance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "COMPONENT")
 	UArrowComponent* SpitPoint;
+	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spit")
+	TSubclassOf<ANBC_ThrowActor> SpitObj;
+	//ANBC_ThrowActor* SpitObj;
+
 
 	virtual void ZombieAttack() override;
-
-
 
 };

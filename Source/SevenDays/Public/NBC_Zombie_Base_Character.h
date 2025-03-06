@@ -63,7 +63,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ZombieHitSound;
 
-
 private:
 	float MaxWalkSpeed;
 

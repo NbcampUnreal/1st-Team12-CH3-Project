@@ -12,8 +12,8 @@
 
 
 /**
- * ÇÃ·¹ÀÌ¾î HUD À§Á¬ Å¬·¡½º
- * Ã¼·Â, Åº¾à, ¹«±â »óÅÂ, Á»ºñ ¼ö, ³·¹ã »óÅÂ¸¦ Ç¥½Ã
+ * ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ HUD ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½
+ * Ã¼ï¿½ï¿½, Åºï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ Ç¥ï¿½ï¿½
  */
 UCLASS()
 class SEVENDAYS_API USevenUserWidget : public UUserWidget
@@ -21,13 +21,13 @@ class SEVENDAYS_API USevenUserWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    virtual void NativeConstruct() override;  // À§Á¬ ÃÊ±âÈ­ ÇÔ¼ö
+    virtual void NativeConstruct() override;  // ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½Ô¼ï¿½
 
-    /** Åº¾à UI ¾÷µ¥ÀÌÆ® */
+    /** Åºï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® */
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateAmmo(int32 CurrentAmmo, int32 TotalAmmo);
 
-    /** ¹«±â UI ¾÷µ¥ÀÌÆ® */
+    /** ï¿½ï¿½ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void UpdateWeaponUI(const FString& WeaponName, int32 CurrentAmmo, int32 MaxAmmo);
 
@@ -39,39 +39,43 @@ public:
 
 
 
-    /** Á»ºñ ¼ö UI ¾÷µ¥ÀÌÆ® */
+    /** ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® */
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateZombieCount(int32 InRemaining, int32 InTotal);
 
-    /** ³·¹ã »óÅÂ UI ¾÷µ¥ÀÌÆ® */
+    /** ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® */
     UFUNCTION(BlueprintCallable, Category = "DayNight")
     void UpdateDayNightCycle(bool bIsNight);
 
-    /** Ã¼·Â UI ¾÷µ¥ÀÌÆ® */
+    /** Ã¼ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® */
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateHealth(float HealthPercent);
 
  
 
-    /** °ÔÀÓ ¿À¹ö UI Ç¥½Ã */
+    /** ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UI Ç¥ï¿½ï¿½ */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ShowGameOverUI();
 
+    /** ï¿½ï¿½Æ® ï¿½ï¿½Ä¿ UI Ç¥ï¿½ï¿½ */
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void HitMarkUI(FVector HitLocation);
 
-
-    /** UI ¿ä¼Ò°¡ ¿Ã¹Ù¸£°Ô ¹ÙÀÎµùµÇ¾ú´ÂÁö È®ÀÎ */
+ 
+protected:
+    /** UI ï¿½ï¿½Ò°ï¿½ ï¿½Ã¹Ù¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ */
     bool EnsureWidget(UWidget* Widget, const FString& WidgetName);
 
 protected:
 
-    /** Ã¼·Â UI */
+    /** Ã¼ï¿½ï¿½ UI */
     UPROPERTY(meta = (BindWidget)) UProgressBar* HealthBar;
     UPROPERTY(meta = (BindWidget)) UTextBlock* HealthText;
 
-    /** Åº¾à UI */
+    /** Åºï¿½ï¿½ UI */
     UPROPERTY(meta = (BindWidget)) UTextBlock* AmmoText;
 
-    /** ¹«±â UI */
+    /** ï¿½ï¿½ï¿½ï¿½ UI */
     UPROPERTY(meta = (BindWidget)) UTextBlock* WeaponText;
     UPROPERTY(meta = (BindWidget)) UTextBlock* WeaponNameText; 
 
@@ -80,14 +84,14 @@ protected:
     UPROPERTY(meta = (BindWidget)) UImage* GrenadeImage;
 
 
-    /** ³·¹ã UI */
+    /** ï¿½ï¿½ï¿½ï¿½ UI */
     UPROPERTY(meta = (BindWidget)) UImage* SunImage;
     UPROPERTY(meta = (BindWidget)) UImage* MoonImage;
 
-    /** Á»ºñ ¼ö UI */
+    /** ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ UI */
     UPROPERTY(meta = (BindWidget)) UTextBlock* ZombiesText;
 
-    /** °ÔÀÓ ¿À¹ö UI */
+    /** ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UI */
  //  UPROPERTY(meta = (BindWidget))
  //  UWidget* GameOverScreen;
  //
@@ -97,12 +101,15 @@ protected:
     UPROPERTY()
     UGameOverWidget* GameOverWidget;
 
+    UPROPERTY()
+    TSubclassOf<UUserWidget> HitMarkWidget; // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-   // /** Quit ¹öÆ° */
+
+   // /** Quit ï¿½ï¿½Æ° */
    // UPROPERTY(meta = (BindWidget))
    // UButton* QuitButton;
    // 
-   // /** Quit ¹öÆ° Å¬¸¯ ÀÌº¥Æ® */
+   // /** Quit ï¿½ï¿½Æ° Å¬ï¿½ï¿½ ï¿½Ìºï¿½Æ® */
    // UFUNCTION()
    // void OnQuitButtonClicked();
 };
