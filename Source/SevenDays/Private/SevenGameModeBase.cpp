@@ -109,22 +109,21 @@ FVector ASevenGameModeBase::GetSpawnLocationForWave(int32 Wave)
         return FVector(0.0f, 0.0f, 200.0f);
     }
 
-    // 웨이브 구간에 따라 스폰 위치 선택
-    if (Wave >= 1 && Wave <= 3)
+    // 1~6 웨이브: 현재 웨이브 수를 기준으로 번갈아 가면서 선택
+    if (Wave >= 1 && Wave <= 6)
     {
-        return PlayerSpawnPoints[0]->GetActorLocation(); // PlayerSpawnPoint1 위치
+        int32 SpawnIndex = (Wave % 2 == 0) ? 0 : 1; // 짝수 웨이브: 1번 스폰 지역, 홀수 웨이브: 2번 스폰 지역
+        return PlayerSpawnPoints[SpawnIndex]->GetActorLocation();
     }
-    else if (Wave >= 4 && Wave <= 6)
-    {
-        return PlayerSpawnPoints[1]->GetActorLocation(); // PlayerSpawnPoint2 위치
-    }
+    // 7 웨이브: 3번 스폰 지역 고정
     else if (Wave == 7)
     {
-        return PlayerSpawnPoints[2]->GetActorLocation(); // PlayerSpawnPoint3 위치
+        return PlayerSpawnPoints[2]->GetActorLocation();
     }
 
     return FVector(0.0f, 0.0f, 200.0f); // 기본값
 }
+
 
 void ASevenGameModeBase::SetPlayerSpawnLocation()
 {
@@ -419,7 +418,6 @@ void ASevenGameModeBase::UpdateDayNightUI()
 //----------좀비
 void ASevenGameModeBase::SpawnZombies()
 {
-    // GameState 대신 SevenGameState로 변경
     ASevenGameStateBase* SevenGameState = GetGameState<ASevenGameStateBase>();
     if (!SevenGameState)
     {
@@ -427,19 +425,44 @@ void ASevenGameModeBase::SpawnZombies()
         return;
     }
 
+    // 7 웨이브: 보스 좀비만 3번 스폰 지역에서 생성
+    if (CurrentWave == 7)
+    {
+        SpawnBossZombie();
+        return;
+    }
+
+    // 1~6 웨이브: 일반 좀비 스폰
     int32 ZombieCount = FMath::Clamp(CurrentWave * 5, 5, 50);
     SevenGameState->SetTotalZombies(ZombieCount);
     SevenGameState->SetRemainingZombies(ZombieCount);
 
     for (int32 i = 0; i < ZombieCount; i++)
     {
-        FVector SpawnLocation = FVector(FMath::RandRange(-500, 500), FMath::RandRange(-500, 500), 100);
+        FVector SpawnLocation = GetSpawnLocationForWave(CurrentWave);
         FRotator SpawnRotation = FRotator::ZeroRotator;
         GetWorld()->SpawnActor<ANBC_Zombie_Base_Character>(ANBC_Zombie_Base_Character::StaticClass(), SpawnLocation, SpawnRotation);
     }
 
     UE_LOG(LogTemp, Warning, TEXT("[Wave %d] Zombies Spawned: %d"), CurrentWave, ZombieCount);
 }
+
+
+void ASevenGameModeBase::SpawnBossZombie()
+{
+    if (!BossZombieClass) return;
+
+    FVector SpawnLocation = GetSpawnLocationForWave(7); // 7 웨이브 스폰 위치 사용
+    FRotator SpawnRotation = FRotator::ZeroRotator;
+
+    ANBC_Zombie_Boss_Character* BossZombie = GetWorld()->SpawnActor<ANBC_Zombie_Boss_Character>(BossZombieClass, SpawnLocation, SpawnRotation);
+
+    if (BossZombie)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Wave 7] Boss Zombie Spawned at %s"), *SpawnLocation.ToString());
+    }
+}
+
 
 void ASevenGameModeBase::SwitchToDay()
 {
@@ -523,4 +546,5 @@ void ASevenGameModeBase::HideLoadingScreen()
         LoadingScreenInstance = nullptr;
     }
 }
+
 

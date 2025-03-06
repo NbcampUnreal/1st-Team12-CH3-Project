@@ -6,6 +6,7 @@
 #include "NBC_SpawnManager.h"
 #include "MiniGameAvoid.h"  
 #include "Blueprint/UserWidget.h"
+#include "NBC_Zombie_Boss_Character.h"
 #include "SevenGameModeBase.generated.h"
 
 
@@ -73,6 +74,14 @@ public:
     /** 로딩 화면 숨기기 */
     void HideLoadingScreen();
 
+    /** 보스 좀비 클래스 */
+    UPROPERTY(EditDefaultsOnly, Category = "Boss")
+    TSubclassOf<class ANBC_Zombie_Boss_Character> BossZombieClass;
+
+
+    /** 보스 좀비 스폰 */
+    void SpawnBossZombie();
+
 
 
 private:
@@ -101,7 +110,6 @@ private:
     TSubclassOf<UUserWidget> LoadingScreenClass;
 
     UUserWidget* LoadingScreenInstance;
-
 
 
 
