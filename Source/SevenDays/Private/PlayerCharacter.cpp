@@ -43,6 +43,8 @@ APlayerCharacter::APlayerCharacter()
 
 	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponComponent"));
 	WeaponComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
+	WeaponComponent->bCastDynamicShadow = false;
+	WeaponComponent->bCastStaticShadow = false;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> RifleMeshAsset(TEXT("/Game/MilitaryWeapDark/Weapons/Assault_Rifle_B.Assault_Rifle_B"));
 	if(RifleMeshAsset.Succeeded())
@@ -255,23 +257,11 @@ void APlayerCharacter::Fire(const FInputActionValue& _Value)
 			bIsFiring = true;
 			GetWorldTimerManager().SetTimer(FireTimerHandle, this, &APlayerCharacter::EnableFire, AR_FireRate, false);
 
-			if (Current_LeftBullet > 0)
+			if (WeaponInfo->GetCurrentBullet() > 0)
 			{
 				ArmsAnimInstance->Montage_Play(FireMontage);
 				WeaponInfo->Fire();
-				Current_LeftBullet--;
-
 				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-				if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
-				{
-					if (ASevenPlayerController* SPC = Cast<ASevenPlayerController>(PC))
-					{
-						if (USevenUserWidget* SUW = SPC->CurrentWidget)
-						{
-							SUW->UpdateAmmo(Current_LeftBullet, Current_MaxBullet);
-						}
-					}
-				}
 			}
 			else
 			{
@@ -305,8 +295,6 @@ void APlayerCharacter::ChangeToAR(const FInputActionValue& _Value)
 		{
 			bIsArmsUpDown = true;
 			bIsChangingWeapon = true;
-
-			SaveWeaponInfo();
 			GetWorldTimerManager().SetTimer(ChangeWeaponTimerHandle, ChangeWeaponARDelegate, ChangeWeaponTime, false);
 		}
 	}
@@ -320,7 +308,6 @@ void APlayerCharacter::ChangeToHG(const FInputActionValue& _Value)
 		{
 			bIsArmsUpDown = true;
 			bIsChangingWeapon = true;
-			SaveWeaponInfo();
 			GetWorldTimerManager().SetTimer(ChangeWeaponTimerHandle, ChangeWeaponHGDelegate, ChangeWeaponTime, false);
 		}
 	}
@@ -334,7 +321,6 @@ void APlayerCharacter::ChangeToGL(const FInputActionValue& _Value)
 		{
 			bIsArmsUpDown = true;
 			bIsChangingWeapon = true;
-			SaveWeaponInfo();
 			GetWorldTimerManager().SetTimer(ChangeWeaponTimerHandle, ChangeWeaponGLDelegate, ChangeWeaponTime, false);
 
 		}
@@ -394,31 +380,6 @@ void APlayerCharacter::ToggleDayNight(const FInputActionValue& _Value)
 	}
 }
 
-void APlayerCharacter::SaveWeaponInfo()
-{
-	switch (CurrentWeaponType)
-	{
-	case EPlayerWeaponType::AR:
-		AR_CurrentBullet = Current_LeftBullet;
-		AR_MaxBullet = Current_MaxBullet;
-		AR_ReloadTime = Current_reloadTime;
-		AR_FireRate = Current_fireRate;
-		break;
-	case EPlayerWeaponType::Pistol:
-		HG_CurrentBullet = Current_LeftBullet;
-		HG_MaxBullet = Current_MaxBullet;
-		HG_ReloadTime = Current_reloadTime;
-		HG_FireRate = Current_fireRate;
-		break;
-	case EPlayerWeaponType::Grenade:
-		GL_CurrentBullet = Current_LeftBullet;
-		GL_MaxBullet = Current_MaxBullet;
-		GL_ReloadTime = Current_reloadTime;
-		GL_FireRate = Current_fireRate;
-		break;
-	}
-}
-
 void APlayerCharacter::OnDeath()
 {
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
@@ -428,7 +389,7 @@ void APlayerCharacter::OnDeath()
 			if (USevenUserWidget* SUW = SPC->CurrentWidget)
 			{
 				SUW->ShowGameOverUI();
-			}
+			}	
 		}
 	}
 }
@@ -471,19 +432,7 @@ void APlayerCharacter::CompleteReloading()
 	bIsReloading = false;
 	bIsBulletEmpty = false;
 	UGameplayStatics::PlaySoundAtLocation(this, CompleteReloadSound, GetActorLocation());
-	Current_LeftBullet = Current_MaxBullet;
-
-	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
-	{
-		if (ASevenPlayerController* SPC = Cast<ASevenPlayerController>(PC))
-		{
-			if (USevenUserWidget* SUW = SPC->CurrentWidget)
-			{
-				SUW->UpdateAmmo(Current_LeftBullet, Current_MaxBullet);
-			}
-		}
-	}
-
+	WeaponInfo->ReLoad();
 }
 
 void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
@@ -503,11 +452,6 @@ void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
 				{
 				case EPlayerWeaponType::AR:
 					CurrentWeaponType = EPlayerWeaponType::AR;
-					Current_reloadTime = AR_ReloadTime;
-					Current_fireRate = AR_FireRate;
-					Current_LeftBullet = AR_CurrentBullet;
-					Current_MaxBullet = AR_MaxBullet;
-					SUW->UpdateWeaponUI((TEXT("Assault Rifle")), Current_LeftBullet, Current_MaxBullet);
 					FPSMeshComponent->SetHiddenInGame(false);
 					WeaponComponent->SetRelativeLocation(FVector(0, 0, 0));
 					WeaponComponent->SetSkeletalMesh(RifleMesh);
@@ -515,32 +459,20 @@ void APlayerCharacter::CompleteChangeWeapon(EPlayerWeaponType _EType)
 
 				case EPlayerWeaponType::Pistol:
 					CurrentWeaponType = EPlayerWeaponType::Pistol;
-					Current_reloadTime = HG_ReloadTime;
-					Current_fireRate = HG_FireRate;
-					Current_LeftBullet = HG_CurrentBullet;
-					Current_MaxBullet = HG_MaxBullet;
-					SUW->UpdateWeaponUI((TEXT("Pistol")), Current_LeftBullet, Current_MaxBullet);
 					FPSMeshComponent->SetHiddenInGame(true);
 					WeaponComponent->SetRelativeLocation(FVector(0, 20, 0));
 					WeaponComponent->SetSkeletalMesh(PistolMesh);
 					break;
 
 				case EPlayerWeaponType::Grenade:
-					CurrentWeaponType = EPlayerWeaponType::Grenade;
-					Current_reloadTime = GL_ReloadTime;
-					Current_fireRate = GL_FireRate;
-					Current_LeftBullet = GL_CurrentBullet;
-					Current_MaxBullet = GL_MaxBullet;
-					SUW->UpdateWeaponUI((TEXT("Grenade")), Current_LeftBullet, Current_MaxBullet);
 					FPSMeshComponent->SetHiddenInGame(false);
 					WeaponComponent->SetRelativeLocation(FVector(0, 0, 0));
 					WeaponComponent->SetSkeletalMesh(LauncherMesh);
 					break;
 				}
+				WeaponInfo->ChangeWeapon(_EType);
 
 				SUW->UpdateWeaponIcons(_EType); // 선택된 무기 아이콘 업데이트
-
-				SUW->UpdateAmmo(Current_LeftBullet, Current_MaxBullet);
 			}
 		}
 	}
