@@ -53,7 +53,51 @@ void ASevenGameModeBase::BeginPlay()
          // 미니게임 자동 실행
          StartMiniGame();
      }
+
+     
+ //  "킬 확정 UI" 블루프린트 로드 (중복 제거)
+     KillConfirmUIClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UI/WB_KillConfirm.WB_KillConfirm_C"));
+     if (!KillConfirmUIClass)
+     {
+         UE_LOG(LogTemp, Error, TEXT("Failed to load Kill Confirm UI. Check the Blueprint path!"));
+         return;
+     }
+
+     APlayerController* PC = GetWorld()->GetFirstPlayerController();
+     if (!PC) return;
+
+     //  "킬 확정 UI" 생성
+     KillConfirmUI = CreateWidget<UUserWidget>(PC, KillConfirmUIClass);
+     if (KillConfirmUI)
+     {
+         KillConfirmUI->AddToViewport();
+         KillConfirmUI->SetVisibility(ESlateVisibility::Hidden);  // 기본적으로 숨김
+         UE_LOG(LogTemp, Warning, TEXT("Kill Confirm UI Loaded Successfully!"));
+     }
+
 }
+
+void ASevenGameModeBase::OnEnemyKilled()
+{
+    if (!KillConfirmUI) return; // UI가 없으면 실행하지 않음.
+
+    KillConfirmUI->SetVisibility(ESlateVisibility::Visible);  // UI 표시
+
+    // 1.5초 후 UI 숨기기
+    FTimerHandle TimerHandle;
+    GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+        {
+            if (KillConfirmUI)
+            {
+                KillConfirmUI->SetVisibility(ESlateVisibility::Hidden);
+            }
+        }, 1.5f, false);
+
+    UE_LOG(LogTemp, Warning, TEXT("Kill Confirm UI Displayed!"));
+}
+
+
+
 
 /** 게임 시작 시 호출 (매니저 초기화 포함) */
 void ASevenGameModeBase::StartPlay()

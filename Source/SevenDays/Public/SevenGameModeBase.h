@@ -52,9 +52,38 @@ public:
 
 
 
+    
+    /** 낮으로 강제 변경 (테스트용) */
+    UFUNCTION(BlueprintCallable, Category = "Test")
+    void TestForceDay();
+
+    /** 밤으로 강제 변경 (테스트용) */
+    UFUNCTION(BlueprintCallable, Category = "Test")
+    void TestForceNight();
+
+    /** 좀비 수 강제 변경 (테스트용) */
+    UFUNCTION(BlueprintCallable, Category = "Test")
+    void TestSetZombieCount(int32 Remaining, int32 Total);
+
+
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    void OnEnemyKilled();
+
+
+
+private:
+    /** 킬 확정 UI 클래스 */
+    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    TSubclassOf<UUserWidget> KillConfirmUIClass;
+
+    /** 킬 확정 UI 인스턴스 */
+    UPROPERTY()
+    UUserWidget* KillConfirmUI;
+
 
 
 protected:
+
     virtual void BeginPlay() override;
     virtual void StartPlay() override;
 
@@ -101,6 +130,8 @@ protected:
 
 
 private:
+
+    
     
     /** 미니게임 위젯 클래스 */
     UPROPERTY(EditDefaultsOnly, Category = "MiniGame")
@@ -112,16 +143,4 @@ private:
     
 
 
-public:
-    /** 낮으로 강제 변경 (테스트용) */
-    UFUNCTION(BlueprintCallable, Category = "Test")
-    void TestForceDay();
-
-    /** 밤으로 강제 변경 (테스트용) */
-    UFUNCTION(BlueprintCallable, Category = "Test")
-    void TestForceNight();
-
-    /** 좀비 수 강제 변경 (테스트용) */
-    UFUNCTION(BlueprintCallable, Category = "Test")
-    void TestSetZombieCount(int32 Remaining, int32 Total);
 };
