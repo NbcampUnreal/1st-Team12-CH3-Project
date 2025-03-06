@@ -50,6 +50,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Point")
 	AActor* SpawnPoint;
 
+	UFUNCTION(BlueprintCallable)
 	//스폰 포인트 위치 정하기
 	void SetSpawnPoint(int32 Point);
 
