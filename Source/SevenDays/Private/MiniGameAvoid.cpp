@@ -122,6 +122,7 @@ void UMiniGameAvoid::NativeConstruct()
     if (ExitButton)
     {
         ExitButton->OnClicked.AddDynamic(this, &UMiniGameAvoid::RemoveFromParent);
+        ExitButton->OnClicked.AddDynamic(this, &UMiniGameAvoid::CallMiniGameComplete);
         ExitButton->SetVisibility(ESlateVisibility::Hidden);
 
     }
@@ -227,6 +228,11 @@ void UMiniGameAvoid::EndGame()
     
     UE_LOG(LogTemp, Warning, TEXT("MiniGame Finished - Showing Results Screen"));
 
+
+}
+
+void UMiniGameAvoid::CallMiniGameComplete()
+{
     // 본 게임으로 나갈 수 있도록 입력 모드 복구
     if (APlayerController* PC = GetOwningPlayer())
     {
@@ -236,18 +242,17 @@ void UMiniGameAvoid::EndGame()
         // UI 유지 (제거하지 않음)
         SetVisibility(ESlateVisibility::Visible);
 
-       // GameMode에 미니게임 종료 알림
-       if (ASevenGameModeBase* GM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this)))
-       {
-           GM->OnMiniGameCompleted();
-       }
+        // GameMode에 미니게임 종료 알림
+        if (ASevenGameModeBase* GM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this)))
+        {
+            GM->OnMiniGameCompleted();
+        }
     }
 
     if (APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
     {
         Player->SupplyARBullet(ClickedObstacles);
     }
-
 }
 
 void UMiniGameAvoid::ExitMiniGame()
