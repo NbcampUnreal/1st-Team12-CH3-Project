@@ -7,7 +7,6 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-
 void ANBC_Zombie_AIController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -17,6 +16,11 @@ void ANBC_Zombie_AIController::BeginPlay()
 void ANBC_Zombie_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	if (bIsDaed)
+	{
+		return;
+	}
 
 	if (InPawn && BehaviorTreeAsset)
 	{
@@ -32,6 +36,7 @@ void ANBC_Zombie_AIController::OnPossess(APawn* InPawn)
 	}
 }
 
+//캐릭터 회전
 void ANBC_Zombie_AIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -48,6 +53,7 @@ void ANBC_Zombie_AIController::Tick(float DeltaTime)
 	}
 }
 
+//생성자
 ANBC_Zombie_AIController::ANBC_Zombie_AIController()
 {
 	// BehaviorComp와 BlackboardComp를 초기화
@@ -57,6 +63,7 @@ ANBC_Zombie_AIController::ANBC_Zombie_AIController()
 	bIsBoss = false;
 }
 
+//게임시작
 void ANBC_Zombie_AIController::StartGame()
 {
 
@@ -86,6 +93,24 @@ void ANBC_Zombie_AIController::StartGame()
 	}
 
 	
+}
+
+void ANBC_Zombie_AIController::Daed()
+{
+	if (GetBlackboardComponent()) // 블랙보드가 있다면
+	{
+		GetBlackboardComponent()->SetValueAsBool("IsDead", true); // 블랙보드 값변경
+		bIsDaed = true;
+	}
+}
+
+void ANBC_Zombie_AIController::Boss()
+{
+	if (GetBlackboardComponent())
+	{
+		GetBlackboardComponent()->SetValueAsBool("IsBoss", true);
+		bIsBoss = true;
+	}
 }
 
 

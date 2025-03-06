@@ -21,7 +21,7 @@ ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ZombieStat = FNBC_ZombieStruct(100, 300, 10,50);
+	ZombieStat = FNBC_ZombieStruct(100, 300, 10,0);
 
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
@@ -29,6 +29,8 @@ ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character()
 		HeadCollision->SetupAttachment(MeshComp, TEXT("Head"));			
 	}
 
+
+	IsDead = false;
 
 	MaxWalkSpeed = 600.0f;
 }
@@ -70,6 +72,8 @@ void ANBC_Zombie_Base_Character::SetActorHiddenInGame(bool bNewHidden)
 
 float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	
+
 	if (ZombieHitSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ZombieHitSound, GetActorLocation());
@@ -103,6 +107,8 @@ float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent co
 	{
 		Death();
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("TakeDamage %d"), ZombieStat.CurrentHp);
 
 	return 0.0f;
 }
@@ -156,6 +162,16 @@ void ANBC_Zombie_Base_Character::Death()
 
 		GetMesh()->SetSimulatePhysics(true);
 		GetMesh()->SetCollisionProfileName("Ragdoll");
+		SetActorEnableCollision(false);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		
+
+
+		if (ANBC_Zombie_AIController* AIController = Cast<ANBC_Zombie_AIController>(GetController()))
+		{
+			//죽었으니 종료
+			AIController->Daed();
+		}
 
 		if (ASevenGameStateBase* test = Cast< ASevenGameStateBase>(GetWorld()->GetGameState()))
 		{

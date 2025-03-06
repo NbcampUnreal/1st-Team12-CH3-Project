@@ -25,7 +25,6 @@ UNBC_BaseGun::UNBC_BaseGun()
 
 	FInfomation = FRifle;
 
-	Type = EPlayerWeaponType::AR;
 
 	ShotReCoilX = 0;
 	ShotReCoilY = 0;
@@ -54,10 +53,16 @@ int32 UNBC_BaseGun::Shot( )
 
 	if (World)
 	{
-		FVector StartLocation = Player->GetActorLocation();
-		FVector EndLocation = StartLocation + Player->GetActorForwardVector()* 10000.0f;
-		FHitResult HitResult;
+		FVector CameraLocation;
+		FRotator  CameraRotation;
 
+		PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+		FVector StartLocation = CameraLocation;
+		FVector EndLocation = StartLocation + (CameraRotation.Vector() * 10000.0f);
+
+
+		FHitResult HitResult;
 		FCollisionQueryParams HitRay;
 		//유저 무시
 		HitRay.AddIgnoredActor(Player);
