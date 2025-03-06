@@ -29,7 +29,6 @@ void ANBC_SpawnManager::SummonEnemy(const FVector Point)
 		return;
 	}
 
-
 	/*if (!ZombieArr.IsEmpty())
 	{
 		TWeakObjectPtr<AActor> WeakZombie = ZombieArr.Pop();
@@ -58,8 +57,6 @@ void ANBC_SpawnManager::SummonEnemy(const FVector Point)
 			SpawnParams);
 
 		ZombieArr.Add(ResultPawn);
-
-		UE_LOG(LogTemp, Log, TEXT("BossZombie class loaded successfully : % s"), *ZombieClass->GetName());
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("LoadedZombieClass is not "));
@@ -108,9 +105,6 @@ void ANBC_SpawnManager::SetRef(const FName& RowName)
 		else {
 			UE_LOG(LogTemp, Log, TEXT("Failed to load class."));
 		}		
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("Failed to load DataTable!"));
 	}
 }
 
@@ -171,13 +165,6 @@ void ANBC_SpawnManager::ClearZombie()
 void ANBC_SpawnManager::CreateBoss(const FVector Point)
 {
 	SetRef(FName(TEXT("BossZombie")));
-	if (this->SpawnPoint)
-	{
-		SummonEnemy(this->SpawnPoint->GetActorLocation());
-	}
-	else {
-		SummonEnemy(Point);
-
-	}
+	SummonEnemy(Point);
 }
 

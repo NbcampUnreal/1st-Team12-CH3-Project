@@ -132,10 +132,6 @@ public:
 	//총 반동 타이머
 	void ReCoilDelayReduction();
 
-	void ChangeWeapon(EPlayerWeaponType type);
-
-	int32 GetCurrentBullet() const { return FInfomation.CurrentBullet; };
-
 protected:
 
 	AActor* Player;
@@ -151,6 +147,7 @@ protected:
 
 	EPlayerWeaponType Type;
 
+	void ChangeWeapon(EPlayerWeaponType type);
 
 	float ShotReCoilX;
 	float ShotReCoilY;
