@@ -95,7 +95,7 @@ public:
     TSubclassOf<USevenUserWidget> HUDWidgetClass;
 
     /** 현재 활성화된 HUD UI 위젯 */
-    UPROPERTY(BlueprintReadOnly, Category = "UI")
+    UPROPERTY(EditAnywhere, Category = "UI")
     USevenUserWidget* CurrentWidget;
 
     /* 무기 */

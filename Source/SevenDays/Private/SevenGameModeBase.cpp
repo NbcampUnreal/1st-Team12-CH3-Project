@@ -123,7 +123,7 @@ FVector ASevenGameModeBase::GetSpawnLocationForWave(int32 Wave)
     else if (Wave == 7)
     {
         SpawnManager->SetSpawnPoint(2);
-        SpawnManager->CreateBoss(SpawnManager->PlayerSpawnPointArray[2]->GetActorLocation());
+        //SpawnManager->CreateBoss(SpawnManager->PlayerSpawnPointArray[2]->GetActorLocation());
         return SpawnManager->PlayerSpawnPointArray[2]->GetActorLocation();
     }
 
@@ -217,6 +217,11 @@ void ASevenGameModeBase::StartWave()
     // 좀비 스폰 실행
     if (SpawnManager)
     {
+        if (CurrentWave == 7) {
+            SpawnManager->CreateBoss(FVector(523.0f, -293.0f, 101.0f));
+            return;
+        }
+        
         int32 SpawnCount = FMath::Clamp(CurrentWave * 5, 5, 50);
         SpawnManager->CreateZombie(SpawnCount, FVector(523.0f, -293.0f, 101.0f));
 
@@ -241,18 +246,22 @@ void ASevenGameModeBase::EndWave()
     }
     else
     {
-        CurrentWave++;
+        CurrentWave = 7;
         if (CurrentWave > WaveLimit)
         {
             return;
         }
 
         
-        bIsNight = false;
+      //  bIsNight = false;
+
+        OnEnemyKilled();
         StartDayPhase();
         SetPlayerSpawnLocation();  //  웨이브 이동 시 플레이어 위치 변경
 
         SpawnManager->ClearZombie(); // 좀비 청소
+
+
     }
 }
 
@@ -360,10 +369,13 @@ void ASevenGameModeBase::OnMiniGameCompleted()
         {
             if (SevenPC->CurrentWidget)
             {
+                UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!!NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
                 SevenPC->CurrentWidget->SetVisibility(ESlateVisibility::Visible);
+
             }
             else
             {
+                UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!!NULL2222222222222!!!!!!!!!!!!!!!!!!!!!"));
                 //  정확한 타입을 지정하여 위젯 생성
                 TSubclassOf<USevenUserWidget> SevenHUDClass = LoadClass<USevenUserWidget>(nullptr, TEXT("/Game/UI/BP_SevenUserWidget.BP_SevenUserWidget_C"));
                 if (SevenHUDClass)
@@ -434,7 +446,7 @@ void ASevenGameModeBase::SpawnZombies()
     // 7 웨이브: 보스 좀비만 3번 스폰 지역에서 생성
     if (CurrentWave == 7)
     {
-        SpawnBossZombie();
+        SpawnManager->CreateBoss(FVector::ZeroVector);
         return;
     }
 
@@ -469,6 +481,22 @@ void ASevenGameModeBase::SpawnBossZombie()
     }
 }
 
+void ASevenGameModeBase::EndCredit()
+{
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (PC)
+    {
+        EndCreditins = CreateWidget<UUserWidget>(PC, EndCreditref);
+        if (EndCreditins)
+        {
+            EndCreditins->AddToViewport(10); // UI 최상단에 추가
+
+            // 입력을 UI 모드로 변경 (플레이어 입력 차단)
+            PC->SetInputMode(FInputModeUIOnly());
+            PC->SetShowMouseCursor(true);
+        }
+    }
+    }
 
 void ASevenGameModeBase::SwitchToDay()
 {
@@ -552,5 +580,4 @@ void ASevenGameModeBase::HideLoadingScreen()
         LoadingScreenInstance = nullptr;
     }
 }
-
 

@@ -61,7 +61,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UI")
     void HitMarkUI(FVector HitLocation);
 
- 
+    UPROPERTY()
+    UGameOverWidget* GameOverWidget;
+
 protected:
     /** UI ��Ұ� �ùٸ��� ���ε��Ǿ����� Ȯ�� */
     bool EnsureWidget(UWidget* Widget, const FString& WidgetName);
@@ -92,17 +94,16 @@ protected:
     UPROPERTY(meta = (BindWidget)) UTextBlock* ZombiesText;
 
     /** ���� ���� UI */
- //  UPROPERTY(meta = (BindWidget))
- //  UWidget* GameOverScreen;
- //
-    UPROPERTY(EditAnywhere, Category = "UI")
-    TSubclassOf<class UGameOverWidget> GameOverWidgetClass;
-
-    UPROPERTY()
-    UGameOverWidget* GameOverWidget;
+    UPROPERTY(meta = (BindWidget))
+    UWidget* GameOverScreen;
+   
 
     UPROPERTY()
     TSubclassOf<UUserWidget> HitMarkWidget; // ����� ����
+
+
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<class UGameOverWidget> GameOverWidgetClass;
 
 
    // /** Quit ��ư */

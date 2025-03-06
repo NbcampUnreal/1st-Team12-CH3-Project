@@ -45,4 +45,7 @@ protected:
 
 	virtual void ZombieAttack() override;
 
+	void Death() override;
+
+
 };

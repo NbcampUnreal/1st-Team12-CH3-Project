@@ -82,7 +82,14 @@ public:
     /** 보스 좀비 스폰 */
     void SpawnBossZombie();
 
+    // 엔드 크레딧 UI 블루프린트 클래스
+    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    TSubclassOf<UUserWidget> EndCreditref;
 
+    // 엔드 크레딧 위젯 인스턴스
+    UUserWidget* EndCreditins;
+
+    void EndCredit();
 
 private:
     /** 킬 확정 UI 클래스 */

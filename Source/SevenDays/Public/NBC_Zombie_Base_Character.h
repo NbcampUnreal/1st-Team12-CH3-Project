@@ -47,7 +47,7 @@ public:
 	virtual void ZombieAttack();
 
 	// Á»ºñ Á×À½
-	void Death();
+	virtual void Death();
 
 	bool IsDead;
 
@@ -62,6 +62,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ZombieHitSound;
+
+	bool IsBoss;
 
 private:
 	float MaxWalkSpeed;

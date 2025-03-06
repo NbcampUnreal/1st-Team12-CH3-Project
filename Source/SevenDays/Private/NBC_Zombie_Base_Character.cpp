@@ -18,10 +18,13 @@
 // Sets default values
 ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character()	
 {
+
+	IsBoss = false;
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ZombieStat = FNBC_ZombieStruct(100, 300, 10,0);
+	ZombieStat = FNBC_ZombieStruct(100, 300, 1,0);
 
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
@@ -194,9 +197,13 @@ void ANBC_Zombie_Base_Character::Death()
 		ASevenGameStateBase* SevenGS = Cast<ASevenGameStateBase>(UGameplayStatics::GetGameState(this));
 		if (SevenGS)
 		{
+			if (IsBoss == false)
+			{
+				SevenGS->ReduceZombieCount();
+			}
 			//int32 NewRemainingZombies = SevenGS->GetRemainingZombies() - 1;
 			//SevenGS->SetRemainingZombies(NewRemainingZombies);
-			SevenGS->ReduceZombieCount();
+			
 
 			//if (NewRemainingZombies <= 0)
 			//{

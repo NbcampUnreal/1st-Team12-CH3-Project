@@ -6,10 +6,14 @@
 #include "Components/ArrowComponent.h"
 #include "NBC_Zombie_AIController.h"
 #include "NBC_ThrowActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "SevenGameModeBase.h"
+
 
 ANBC_Zombie_Boss_Character::ANBC_Zombie_Boss_Character()
 {
-	ZombieStat = FNBC_ZombieStruct(1500, 350, 25, 30);
+	IsBoss = true;
+	ZombieStat = FNBC_ZombieStruct(1, 350, 25, 30);
 		
 
 	if (USkeletalMeshComponent* skel = GetMesh())
@@ -85,6 +89,18 @@ void ANBC_Zombie_Boss_Character::FireProject()
 void ANBC_Zombie_Boss_Character::ZombieAttack()
 {	
 	Super::ZombieAttack();
+}
+
+void ANBC_Zombie_Boss_Character::Death()
+{
+	Super::Death();
+
+	ASevenGameModeBase* Mode = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if
+		(Mode)
+	{
+		Mode->EndCredit();
+	}
 }
 
 
