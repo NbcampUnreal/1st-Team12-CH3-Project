@@ -49,6 +49,8 @@ public:
 	// Á»ºñ Á×À½
 	void Death();
 
+	bool IsDead;
+
 protected:
 	//Á»ºñ½ºÅÝ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
