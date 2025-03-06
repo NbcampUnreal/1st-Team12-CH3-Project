@@ -81,18 +81,32 @@ int32 UNBC_BaseGun::Shot( )
 
 			ANBC_Zombie_Base_Character* Zombie = Cast<ANBC_Zombie_Base_Character>(HitResult.GetActor());
 
-			//HitResult.GetActor()->ActorHasTag("ZombieHead")
-			if (Zombie && HitResult.BoneName == FName("Head")) // 머리 맞았는지 확인
+			UPrimitiveComponent* Hitcomponent = HitResult.GetComponent();
+
+			if (Zombie && Hitcomponent->ComponentHasTag("Head")) // 머리 맞았는지 확인
 			{
+
+				if (ASevenPlayerController* Controller = Cast<ASevenPlayerController>(PlayerController))
+				{
+					Controller->CurrentWidget->HitMarkUI(Zombie->GetActorLocation());
+				}
+
 				//헤드샷 
 				//데미지 주는 함수 블로그 참조
 				UE_LOG(LogTemp, Warning, TEXT("-------------- HeadShot"));
 
 
 				UGameplayStatics::ApplyDamage(Zombie, FInfomation.Damage * 2, PlayerController, Player, UDamageType::StaticClass());
+
+				
 			}
 			else if (Zombie)
 			{
+
+				if (ASevenPlayerController* Controller = Cast<ASevenPlayerController>(PlayerController))
+				{
+					Controller->CurrentWidget->HitMarkUI(Zombie->GetActorLocation());
+				}
 
 				UE_LOG(LogTemp, Warning, TEXT("-------------- Shot"));
 				//데미지 주는 함수 블로그 참조

@@ -5,10 +5,11 @@
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 #include "NBC_Zombie_AIController.h"
+#include "NBC_ThrowActor.h"
 
 ANBC_Zombie_Boss_Character::ANBC_Zombie_Boss_Character()
 {
-	ZombieStat = FNBC_ZombieStruct(1500, 350, 25, 50);
+	ZombieStat = FNBC_ZombieStruct(1500, 350, 25, 30);
 		
 
 	if (USkeletalMeshComponent* skel = GetMesh())
@@ -54,6 +55,29 @@ void ANBC_Zombie_Boss_Character::PossessedBy(AController* NewController)
 		AIController->Boss();
 	}
 
+}
+
+void ANBC_Zombie_Boss_Character::FireProject()
+{
+	if (SpitObj)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this; // 생성한 캐릭터
+
+		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; // 캐릭터 앞에서 생성
+		FRotator SpawnRotation = GetActorRotation();
+
+
+		ANBC_ThrowActor* Spit = GetWorld()->SpawnActor<ANBC_ThrowActor>(SpitObj, SpawnLocation, SpawnRotation, SpawnParams);
+
+
+		//방향설정
+		if (Spit) {
+			FVector Direction = SpitPoint->GetForwardVector();
+			Spit->Direction = Direction;
+		}
+
+	}
 }
 
 // --------------- 좀비 패턴 -----------------------------

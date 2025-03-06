@@ -26,8 +26,12 @@ ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character()
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
 		HeadCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("HeadCollision"));
-		HeadCollision->SetupAttachment(MeshComp, TEXT("Head"));			
+		HeadCollision->SetupAttachment(MeshComp, TEXT("Head"));		
+		HeadCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);  // 쿼리용 콜리전만 활성화
+		HeadCollision->ComponentHasTag("Head");  // 태그 설정
+
 	}
+
 
 
 	IsDead = false;
@@ -73,7 +77,6 @@ void ANBC_Zombie_Base_Character::SetActorHiddenInGame(bool bNewHidden)
 float ANBC_Zombie_Base_Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	
-
 	if (ZombieHitSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ZombieHitSound, GetActorLocation());

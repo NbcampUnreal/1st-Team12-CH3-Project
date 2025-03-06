@@ -186,6 +186,35 @@ void USevenUserWidget::ShowGameOverUI()
     }
 }
 
+void USevenUserWidget::HitMarkUI(FVector HitLocation)
+{
+
+    APlayerController* playerController = GetOwningPlayer();
+
+    if (HitMarkWidget && playerController)
+    {
+        
+        // 위젯을 생성합니다.
+        UUserWidget* HitMarker = CreateWidget<UUserWidget>(playerController, HitMarkWidget);
+        
+
+        if (HitMarker)
+        {
+            HitMarker->AddToViewport();
+
+            // 화면 좌표로 변환 (월드 좌표 -> 화면 좌표)
+            FVector2D ScreenPosition;
+            playerController->ProjectWorldLocationToScreen(HitLocation, ScreenPosition);
+
+            // UI의 위치를 설정
+            HitMarker->SetPositionInViewport(ScreenPosition);
+            
+
+        }
+
+    }
+}
+
 
 
 // /// Quit 버튼 클릭 시 호출: 게임을 종료합니다.
