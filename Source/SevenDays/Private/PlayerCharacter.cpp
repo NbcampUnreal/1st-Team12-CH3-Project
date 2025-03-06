@@ -39,6 +39,7 @@ APlayerCharacter::APlayerCharacter()
 	FPSMeshComponent->bCastDynamicShadow = false;
 	FPSMeshComponent->bCastStaticShadow = false;
 	
+	WeaponInfo = NewObject<UNBC_BaseGun>();
 
 	WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponComponent"));
 	WeaponComponent->SetupAttachment(FPSMeshComponent, TEXT("rifle_socket"));
@@ -152,12 +153,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		}
 	}
-}
-
-void APlayerCharacter::PossessedBy(AController* NewController)
-{
-	Super::PossessedBy(NewController);
-	WeaponInfo = NewObject<UNBC_BaseGun>();
 }
 
 void APlayerCharacter::SupplyARBullet(int _addBullet)

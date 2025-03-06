@@ -22,8 +22,6 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	virtual void PossessedBy(AController* NewController);
-
 	//애니메이션 인스턴스 (보스용)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ANIM")
 	UZombieBossAnimInstance* AnimInstance;

@@ -25,7 +25,7 @@ public:
 	APlayerCharacter();
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void PossessedBy(AController* NewController) override;
+
 private:
 	float WalkSpeed = 400.0f;
 	float SprintSpeed = 700.0f;
