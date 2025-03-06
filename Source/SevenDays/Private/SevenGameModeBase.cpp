@@ -12,12 +12,19 @@
 /** 생성자: 기본값 설정 */
 ASevenGameModeBase::ASevenGameModeBase()
 {
+    // 로딩 화면 블루프린트 로드
+    static ConstructorHelpers::FClassFinder<UUserWidget> LoadingScreenBP(TEXT("/Game/UI/WB_LoadingScreen.WB_LoadingScreen_C"));
+    if (LoadingScreenBP.Succeeded())
+    {
+        LoadingScreenClass = LoadingScreenBP.Class;
+    }
     DefaultPawnClass = APlayerCharacter::StaticClass();
 
     CurrentWave = 1;
     bIsNight = false;
     bUseMiniGame = false;
     bIsMiniGameActive = false;
+
 }
 
 /** 게임 시작 시 실행 (UI 설정 포함) */
@@ -75,13 +82,70 @@ void ASevenGameModeBase::BeginPlay()
          UE_LOG(LogTemp, Warning, TEXT("Kill Confirm UI Loaded Successfully!"));
      }
 
+     // "PlayerSpawnPoint"라는 이름을 가진 액터들을 모두 찾기
+     UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("PlayerSpawnPoint"), PlayerSpawnPoints);
+
+     if (PlayerSpawnPoints.Num() == 0)
+     {
+         UE_LOG(LogTemp, Error, TEXT("No PlayerSpawnPoints found in the level!"));
+     }
+     else
+     {
+         UE_LOG(LogTemp, Warning, TEXT("Found %d PlayerSpawnPoints"), PlayerSpawnPoints.Num());
+     }
+
+     // 첫 웨이브 스폰 위치 적용
+     SetPlayerSpawnLocation();
+
+
+
 }
+
+FVector ASevenGameModeBase::GetSpawnLocationForWave(int32 Wave)
+{
+    if (PlayerSpawnPoints.Num() < 3)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Not enough PlayerSpawnPoints found!"));
+        return FVector(0.0f, 0.0f, 200.0f);
+    }
+
+    // 웨이브 구간에 따라 스폰 위치 선택
+    if (Wave >= 1 && Wave <= 3)
+    {
+        return PlayerSpawnPoints[0]->GetActorLocation(); // PlayerSpawnPoint1 위치
+    }
+    else if (Wave >= 4 && Wave <= 6)
+    {
+        return PlayerSpawnPoints[1]->GetActorLocation(); // PlayerSpawnPoint2 위치
+    }
+    else if (Wave == 7)
+    {
+        return PlayerSpawnPoints[2]->GetActorLocation(); // PlayerSpawnPoint3 위치
+    }
+
+    return FVector(0.0f, 0.0f, 200.0f); // 기본값
+}
+
+void ASevenGameModeBase::SetPlayerSpawnLocation()
+{
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC || !PC->GetPawn()) return;
+
+    // 현재 웨이브에 맞는 스폰 위치 가져오기
+    FVector SpawnLocation = GetSpawnLocationForWave(CurrentWave);
+
+    // 플레이어 이동
+    PC->GetPawn()->SetActorLocation(SpawnLocation);
+    UE_LOG(LogTemp, Warning, TEXT("Player moved to Wave %d location: %s"), CurrentWave, *SpawnLocation.ToString());
+}
+
+
 
 void ASevenGameModeBase::OnEnemyKilled()
 {
-    if (!KillConfirmUI) return; // UI가 없으면 실행하지 않음.
+    if (!KillConfirmUI) return;
 
-    KillConfirmUI->SetVisibility(ESlateVisibility::Visible);  // UI 표시
+    KillConfirmUI->SetVisibility(ESlateVisibility::Visible);
 
     // 1.5초 후 UI 숨기기
     FTimerHandle TimerHandle;
@@ -94,7 +158,27 @@ void ASevenGameModeBase::OnEnemyKilled()
         }, 1.5f, false);
 
     UE_LOG(LogTemp, Warning, TEXT("Kill Confirm UI Displayed!"));
+
+    // 현재 남은 좀비 수 확인
+    ASevenGameStateBase* SevenGameState = GetGameState<ASevenGameStateBase>();
+    if (SevenGameState && SevenGameState->GetRemainingZombies() == 0)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("All Zombies Killed! Showing Loading Screen..."));
+
+        // 1. 로딩 화면 표시
+        ShowLoadingScreen();
+
+        // 2. 2초 후 미니게임 시작
+        FTimerHandle MiniGameTimer;
+        GetWorldTimerManager().SetTimer(MiniGameTimer, [this]() 
+            {
+                HideLoadingScreen(); // 로딩 화면 숨기기
+                StartMiniGame(); // 미니게임 시작
+            }, 2.0f, false); // 2초 대기
+
+    }
 }
+
 
 
 
@@ -158,8 +242,12 @@ void ASevenGameModeBase::EndWave()
             return;
         }
 
+        
         bIsNight = false;
         StartDayPhase();
+        SetPlayerSpawnLocation();  //  웨이브 이동 시 플레이어 위치 변경
+
+
     }
 }
 
@@ -403,3 +491,36 @@ void ASevenGameModeBase::SetTotalZombies(int32 NewValue)
         SevenGS->SetTotalZombies(NewValue);
     }
 }
+
+//로딩화면
+void ASevenGameModeBase::ShowLoadingScreen()
+{
+    if (!LoadingScreenClass) return;
+
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC) return;
+
+    // 기존 로딩 화면이 있으면 제거
+    if (LoadingScreenInstance)
+    {
+        LoadingScreenInstance->RemoveFromParent();
+        LoadingScreenInstance = nullptr;
+    }
+
+    // 새로운 로딩 화면 생성
+    LoadingScreenInstance = CreateWidget<UUserWidget>(PC, LoadingScreenClass);
+    if (LoadingScreenInstance)
+    {
+        LoadingScreenInstance->AddToViewport(10); // 가장 위에 표시
+    }
+}
+
+void ASevenGameModeBase::HideLoadingScreen()
+{
+    if (LoadingScreenInstance)
+    {
+        LoadingScreenInstance->RemoveFromParent();
+        LoadingScreenInstance = nullptr;
+    }
+}
+

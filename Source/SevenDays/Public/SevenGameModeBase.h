@@ -51,8 +51,6 @@ public:
     void EndMiniGame();
 
 
-
-    
     /** 낮으로 강제 변경 (테스트용) */
     UFUNCTION(BlueprintCallable, Category = "Test")
     void TestForceDay();
@@ -69,6 +67,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Combat")
     void OnEnemyKilled();
 
+    /** 로딩 화면 표시 */
+    void ShowLoadingScreen();
+
+    /** 로딩 화면 숨기기 */
+    void HideLoadingScreen();
+
 
 
 private:
@@ -79,6 +83,26 @@ private:
     /** 킬 확정 UI 인스턴스 */
     UPROPERTY()
     UUserWidget* KillConfirmUI;
+
+
+    /** 플레이어 스폰 포인트 배열 */
+    UPROPERTY()
+    TArray<AActor*> PlayerSpawnPoints;
+
+    /** 현재 웨이브에 맞는 스폰 위치 찾기 */
+    FVector GetSpawnLocationForWave(int32 Wave);
+
+
+    /** 웨이브 진행 시 플레이어를 스폰 위치로 이동 */
+    void SetPlayerSpawnLocation();
+
+    //로딩화면
+    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    TSubclassOf<UUserWidget> LoadingScreenClass;
+
+    UUserWidget* LoadingScreenInstance;
+
+
 
 
 

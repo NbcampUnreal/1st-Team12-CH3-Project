@@ -57,10 +57,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ShowGameOverUI();
 
- 
-protected:
+
+
     /** UI 요소가 올바르게 바인딩되었는지 확인 */
     bool EnsureWidget(UWidget* Widget, const FString& WidgetName);
+
+protected:
 
     /** 체력 UI */
     UPROPERTY(meta = (BindWidget)) UProgressBar* HealthBar;
