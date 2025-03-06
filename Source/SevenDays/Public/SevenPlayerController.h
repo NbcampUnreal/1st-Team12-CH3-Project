@@ -101,8 +101,6 @@ public:
     /* 무기 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void UpdateWeaponUI(const FString& WeaponName, int32 CurrentAmmo, int32 MaxAmmo);
-    UFUNCTION(BlueprintCallable, Category = "UI")
-    void ChangeWeapon(EPlayerWeaponType NewWeaponType);
 
 
     /* 좀비 */

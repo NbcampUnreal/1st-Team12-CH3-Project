@@ -162,6 +162,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 
 void APlayerCharacter::SupplyARBullet(int _addBullet)
 {
+	WeaponInfo->AddMaxBullet(_addBullet);
 }
 
 void APlayerCharacter::Move(const FInputActionValue& _Value)
@@ -260,7 +261,7 @@ void APlayerCharacter::Fire(const FInputActionValue& _Value)
 		if (!bIsFiring && !bIsReloading && !bIsChangingWeapon)
 		{
 			bIsFiring = true;
-			GetWorldTimerManager().SetTimer(FireTimerHandle, this, &APlayerCharacter::EnableFire, AR_FireRate, false);
+			GetWorldTimerManager().SetTimer(FireTimerHandle, this, &APlayerCharacter::EnableFire, WeaponInfo->GetShotDelay(), false);
 
 			if (WeaponInfo->GetCurrentBullet() > 0)
 			{
@@ -287,7 +288,7 @@ void APlayerCharacter::Reload(const FInputActionValue& _Value)
 			bIsArmsUpDown = true;
 			bIsReloading = true;
 			UGameplayStatics::PlaySoundAtLocation(this, ReloadSound, GetActorLocation());
-			GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &APlayerCharacter::CompleteReloading, AR_ReloadTime, false);
+			GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &APlayerCharacter::CompleteReloading, WeaponInfo->GetReloadDelay(), false);
 		}
 	}
 }
