@@ -194,18 +194,19 @@ void ANBC_Zombie_Base_Character::Death()
 		ASevenGameStateBase* SevenGS = Cast<ASevenGameStateBase>(UGameplayStatics::GetGameState(this));
 		if (SevenGS)
 		{
-			int32 NewRemainingZombies = SevenGS->GetRemainingZombies() - 1;
-			SevenGS->SetRemainingZombies(NewRemainingZombies);
+			//int32 NewRemainingZombies = SevenGS->GetRemainingZombies() - 1;
+			//SevenGS->SetRemainingZombies(NewRemainingZombies);
+			SevenGS->ReduceZombieCount();
 
-			if (NewRemainingZombies <= 0)
-			{
-				// 모든 좀비가 사망하면 웨이브 종료
-				ASevenGameModeBase* SevenGM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this));
-				if (SevenGM)
-				{
-					SevenGM->EndWave();
-				}
-			}
+			//if (NewRemainingZombies <= 0)
+			//{
+			//	// 모든 좀비가 사망하면 웨이브 종료
+			//	ASevenGameModeBase* SevenGM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this));
+			//	if (SevenGM)
+			//	{
+			//		SevenGM->EndWave();
+			//	}
+			//}
 		}
 	}
 }

@@ -94,16 +94,17 @@ void ASevenGameModeBase::BeginPlay()
          UE_LOG(LogTemp, Warning, TEXT("Found %d PlayerSpawnPoints"), PlayerSpawnPoints.Num());
      }
 
+     SpawnManager = Cast<ANBC_SpawnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ANBC_SpawnManager::StaticClass()));
+
      // 첫 웨이브 스폰 위치 적용
      SetPlayerSpawnLocation();
-
 
 
 }
 
 FVector ASevenGameModeBase::GetSpawnLocationForWave(int32 Wave)
 {
-    if (PlayerSpawnPoints.Num() < 3)
+    if (SpawnManager->PlayerSpawnPointArray.Num() < 3)
     {
         UE_LOG(LogTemp, Error, TEXT("Not enough PlayerSpawnPoints found!"));
         return FVector(0.0f, 0.0f, 200.0f);
@@ -113,12 +114,17 @@ FVector ASevenGameModeBase::GetSpawnLocationForWave(int32 Wave)
     if (Wave >= 1 && Wave <= 6)
     {
         int32 SpawnIndex = (Wave % 2 == 0) ? 0 : 1; // 짝수 웨이브: 1번 스폰 지역, 홀수 웨이브: 2번 스폰 지역
-        return PlayerSpawnPoints[SpawnIndex]->GetActorLocation();
+        SpawnManager->SetSpawnPoint(SpawnIndex);
+        return SpawnManager->PlayerSpawnPointArray[SpawnIndex]->GetActorLocation();
+        //PlayerSpawnPoints[SpawnIndex]->GetActorLocation();
+
     }
     // 7 웨이브: 3번 스폰 지역 고정
     else if (Wave == 7)
     {
-        return PlayerSpawnPoints[2]->GetActorLocation();
+        SpawnManager->SetSpawnPoint(2);
+        SpawnManager->CreateBoss(SpawnManager->PlayerSpawnPointArray[2]->GetActorLocation());
+        return SpawnManager->PlayerSpawnPointArray[2]->GetActorLocation();
     }
 
     return FVector(0.0f, 0.0f, 200.0f); // 기본값
@@ -246,7 +252,7 @@ void ASevenGameModeBase::EndWave()
         StartDayPhase();
         SetPlayerSpawnLocation();  //  웨이브 이동 시 플레이어 위치 변경
 
-
+        SpawnManager->ClearZombie(); // 좀비 청소
     }
 }
 
