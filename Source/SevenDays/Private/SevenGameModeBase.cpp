@@ -208,12 +208,12 @@ void ASevenGameModeBase::OnMiniGameCompleted()
 
     bIsMiniGameActive = false;
 
-    //  미니게임 UI 제거
-    if (MiniGameInstance)
-    {
-        MiniGameInstance->RemoveFromParent();
-        MiniGameInstance = nullptr;
-    }
+   // //  미니게임 UI 제거
+   // if (MiniGameInstance)
+   // {
+   //     MiniGameInstance->RemoveFromParent();
+   //     MiniGameInstance = nullptr;
+   // }
 
     APlayerController* PC = GetWorld()->GetFirstPlayerController();
     if (PC)

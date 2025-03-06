@@ -122,6 +122,7 @@ void UMiniGameAvoid::NativeConstruct()
     {
         ExitButton->OnClicked.AddDynamic(this, &UMiniGameAvoid::RemoveFromParent);
         ExitButton->SetVisibility(ESlateVisibility::Hidden);
+
     }
 
     SetKeyboardFocus();
@@ -222,7 +223,7 @@ void UMiniGameAvoid::EndGame()
         ExitButton->SetVisibility(ESlateVisibility::Visible);
     }
 
-    // UI 유지: `RemoveFromParent()`를 호출하지 않음! (이전에는 여기서 제거되었음)
+    
     UE_LOG(LogTemp, Warning, TEXT("MiniGame Finished - Showing Results Screen"));
 
     // 본 게임으로 나갈 수 있도록 입력 모드 복구
@@ -234,15 +235,29 @@ void UMiniGameAvoid::EndGame()
         // UI 유지 (제거하지 않음)
         SetVisibility(ESlateVisibility::Visible);
 
-        // GameMode에 미니게임 종료 알림
-        if (ASevenGameModeBase* GM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this)))
-        {
-            GM->OnMiniGameCompleted();
-        }
+       // GameMode에 미니게임 종료 알림
+       if (ASevenGameModeBase* GM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this)))
+       {
+           GM->OnMiniGameCompleted();
+       }
     }
 
-    // 미니게임 UI 제거
-    RemoveFromParent();
-
-    UE_LOG(LogTemp, Warning, TEXT("MiniGame Finished - Returning to Main Game"));
 }
+
+void UMiniGameAvoid::ExitMiniGame()
+{
+    if (ASevenGameModeBase* GM = Cast<ASevenGameModeBase>(UGameplayStatics::GetGameMode(this)))
+    {
+        GM->OnMiniGameCompleted();  //  Exit 버튼을 눌렀을 때만 밤 시작!
+    }
+
+    APlayerController* PC = GetOwningPlayer();
+    if (PC)
+    {
+        PC->SetInputMode(FInputModeGameOnly());  // 본 게임 입력 모드로 변경
+        PC->SetShowMouseCursor(false);          // 마우스 숨김
+    }
+
+    RemoveFromParent();  // UI 제거
+}
+
