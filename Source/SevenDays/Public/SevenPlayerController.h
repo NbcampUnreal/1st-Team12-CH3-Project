@@ -46,7 +46,13 @@ protected:
 
 public:
     ASevenPlayerController();
-
+ //
+ //  /** 미니게임 시작 함수 */
+ //  void StartMiniGame();
+ //
+ //  /** 미니게임 종료 후 본 게임으로 이동하는 함수 */
+ //  void EndMiniGame();
+ //
     /** 마우스 커서 표시 여부 설정 함수 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void SetMouseVisibility(bool bVisible);
@@ -108,5 +114,14 @@ public:
     /** 게임 UI (HUD) 표시 함수 */
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ShowGameUI();
+
+private:
+  // /** 미니게임 위젯 클래스 */
+  // UPROPERTY(EditDefaultsOnly, Category = "UI")
+  // TSubclassOf<UMiniGameAvoid> MiniGameClass;
+  //
+  // /** 미니게임 위젯 인스턴스 */
+  // UPROPERTY()
+  // UMiniGameAvoid* MiniGameInstance;
 
 };

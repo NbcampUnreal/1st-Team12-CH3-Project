@@ -42,6 +42,17 @@ void ASevenGameModeBase::BeginPlay()
             }
         }
     }
+
+
+     FString CurrentLevel = UGameplayStatics::GetCurrentLevelName(GetWorld());
+    
+     if (CurrentLevel == TEXT("GameMap"))
+     {
+         UE_LOG(LogTemp, Warning, TEXT("GameMap Loaded - Starting MiniGame"));
+    
+         // 미니게임 자동 실행
+         StartMiniGame();
+     }
 }
 
 /** 게임 시작 시 호출 (매니저 초기화 포함) */
@@ -83,8 +94,6 @@ void ASevenGameModeBase::StartWave()
 /** 웨이브 종료 */
 void ASevenGameModeBase::EndWave()
 {
-    UE_LOG(LogTemp, Warning, TEXT("[Wave %d] END - %s"), CurrentWave, bIsNight ? TEXT("Night") : TEXT("Day"));
-
     if (!bIsNight)
     {
         bIsNight = true;
@@ -102,21 +111,12 @@ void ASevenGameModeBase::EndWave()
         CurrentWave++;
         if (CurrentWave > WaveLimit)
         {
-            UE_LOG(LogTemp, Warning, TEXT("[SevenGameModeBase] All waves finished!"));
             return;
         }
 
         bIsNight = false;
         StartDayPhase();
-
-
     }
-
-    if (!bIsNight)
-    {
-        TestForceDay(); // 낮일 때만 실행
-    }
-
 }
 
 /** 낮 시작 */
@@ -150,13 +150,129 @@ void ASevenGameModeBase::StartNightPhase()
     UpdateDayNightUI();
 }
 
-/** 미니게임 완료 후 밤 시작 */
-void ASevenGameModeBase::OnMiniGameCompleted()
+
+ 
+
+void ASevenGameModeBase::StartMiniGame()
 {
-    bIsMiniGameActive = false;
-    StartNightPhase();
+    if (!MiniGameClass)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SevenGameModeBase] MiniGameClass fail"));
+        return;
+    }
+
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC)
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SevenGameModeBase] player fail"));
+        return;
+    }
+
+    // 기존 UI 숨기기
+    if (ASevenPlayerController* SevenPC = Cast<ASevenPlayerController>(PC))
+    {
+        if (SevenPC->CurrentWidget)
+        {
+            SevenPC->CurrentWidget->SetVisibility(ESlateVisibility::Hidden);
+        }
+    }
+
+    // 미니게임 UI 생성 및 추가
+    MiniGameInstance = CreateWidget<UMiniGameAvoid>(PC, MiniGameClass);
+    if (MiniGameInstance)
+    {
+        MiniGameInstance->AddToViewport(1); // ZOrder를 1로 설정하여 최상위 UI로 배치
+
+      // // 미니게임 UI에 직접 포커스 설정
+      // FSlateApplication::Get().SetUserFocus(0, MiniGameInstance->TakeWidget());
+
+        // 입력 모드를 UI 전용으로 변경
+        PC->SetInputMode(FInputModeUIOnly());
+        PC->SetShowMouseCursor(true);
+
+
+        UE_LOG(LogTemp, Warning, TEXT("[SevenGameModeBase] minigame UI done"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("[SevenGameModeBase] minigame UI fail!"));
+    }
 }
 
+
+
+ 
+void ASevenGameModeBase::OnMiniGameCompleted()
+{
+    UE_LOG(LogTemp, Warning, TEXT("MiniGame Completed - Starting Night Phase"));
+
+    bIsMiniGameActive = false;
+
+   // //  미니게임 UI 제거
+   // if (MiniGameInstance)
+   // {
+   //     MiniGameInstance->RemoveFromParent();
+   //     MiniGameInstance = nullptr;
+   // }
+
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (PC)
+    {
+        //  기존 UI 복구 (SevenUserWidget을 올바르게 생성)
+        if (ASevenPlayerController* SevenPC = Cast<ASevenPlayerController>(PC))
+        {
+            if (SevenPC->CurrentWidget)
+            {
+                SevenPC->CurrentWidget->SetVisibility(ESlateVisibility::Visible);
+            }
+            else
+            {
+                //  정확한 타입을 지정하여 위젯 생성
+                TSubclassOf<USevenUserWidget> SevenHUDClass = LoadClass<USevenUserWidget>(nullptr, TEXT("/Game/UI/BP_SevenUserWidget.BP_SevenUserWidget_C"));
+                if (SevenHUDClass)
+                {
+                    SevenPC->CurrentWidget = CreateWidget<USevenUserWidget>(PC, SevenHUDClass); // USevenUserWidget으로 변경
+                    if (SevenPC->CurrentWidget)
+                    {
+                        SevenPC->CurrentWidget->AddToViewport();
+                    }
+                }
+            }
+        }
+
+        //  입력 모드를 게임 모드로 복구
+        PC->SetInputMode(FInputModeGameOnly());
+        PC->SetShowMouseCursor(false);
+    }
+
+    StartNightPhase();
+}
+ 
+
+ void ASevenGameModeBase::EndMiniGame()
+ {
+     UE_LOG(LogTemp, Warning, TEXT("MiniGame Finished - Starting FPS Game"));
+ 
+     APlayerController* PC = GetWorld()->GetFirstPlayerController();
+     if (PC)
+     {
+         PC->SetInputMode(FInputModeGameOnly());
+         PC->SetShowMouseCursor(false);
+     }
+ 
+     // 미니게임 UI 제거 (필요하면 추가)
+     UUserWidget* MiniGameUI = Cast<UUserWidget>(PC->GetHUD());
+     if (MiniGameUI)
+     {
+         MiniGameUI->RemoveFromParent();
+     }
+ 
+     OnMiniGameCompleted();
+ 
+     // 본 게임 시작 로직 (필요하면 추가)
+ }
+ 
+ 
 /** 낮/밤 UI 업데이트 */
 void ASevenGameModeBase::UpdateDayNightUI()
 {
@@ -195,7 +311,7 @@ void ASevenGameModeBase::SpawnZombies()
 
 void ASevenGameModeBase::SwitchToDay()
 {
-    ASevenGameStateBase* SevenGameState = GetGameState<ASevenGameStateBase>(); 
+    ASevenGameStateBase* SevenGameState = GetGameState<ASevenGameStateBase>();
 
     if (SevenGameState && SevenGameState->GetRemainingZombies() == 0)
     {
