@@ -67,9 +67,7 @@ public:
 	void SupplyARBullet(int _addBullet);
 
 protected:
-	//테스트용
-	//TODO: 나중에 불필요시 제거
-	// 추후에 무기 클래스 내의 변수를 이용하기
+	// 사격 등 동작에 대한 제한 사항
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Status")
 	bool bIsReloading = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Status")
@@ -81,24 +79,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Status")
 	float ChangeWeaponTime = 2.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	float AR_ReloadTime = 2.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	float AR_FireRate = 0.1f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	int32 AR_CurrentBullet = 30;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	int32 AR_MaxBullet = 30;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	float HG_ReloadTime = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	float HG_FireRate = 2.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	int32 HG_CurrentBullet = 6;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
-	int32 HG_MaxBullet = 6;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TEST|Weapon")
 	float GL_ReloadTime = 3.0f;

@@ -135,6 +135,8 @@ public:
 	void ChangeWeapon(EPlayerWeaponType type);
 
 	int32 GetCurrentBullet() const { return FInfomation.CurrentBullet; };
+	float GetShotDelay() const { return FInfomation.fShotDelay; };
+	float GetReloadDelay() const { return FInfomation.fReloadDelay; };
 
 	void AddMaxBullet(int32 AddBullet);
 
