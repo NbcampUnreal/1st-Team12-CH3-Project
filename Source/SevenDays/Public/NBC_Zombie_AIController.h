@@ -22,6 +22,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartGame();
 
+	void Daed();
+
+	void Boss();
+
 protected:
 	
 	virtual void BeginPlay() override;
@@ -36,6 +40,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Value")
 	bool bIsBoss = false;   // 기본값 설정
+
+	bool bIsDaed = false;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 	UBehaviorTree* BehaviorTreeAsset;
