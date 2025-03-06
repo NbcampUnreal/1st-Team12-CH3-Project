@@ -57,6 +57,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ShowGameOverUI();
 
+    /** 히트 마커 UI 표시 */
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void HitMarkUI(FVector HitLocation);
+
  
 protected:
     /** UI 요소가 올바르게 바인딩되었는지 확인 */
@@ -94,6 +98,9 @@ protected:
 
     UPROPERTY()
     UGameOverWidget* GameOverWidget;
+
+    UPROPERTY()
+    TSubclassOf<UUserWidget> HitMarkWidget; // 대미지 위젯
 
 
    // /** Quit 버튼 */
