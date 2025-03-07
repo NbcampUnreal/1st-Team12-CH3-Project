@@ -138,7 +138,7 @@ void UNBC_BaseGun::ReLoad()
 
 	
 	//필요한 총알 개수 // 30 - 22  = 8 개 
-	int32 necessaryBullet = FMath::Clamp( FInfomation.BulletCount - FInfomation.CurrentBullet
+	int32 necessaryBullet = FMath::Clamp( FInfomation.MaxBullet - FInfomation.CurrentBullet
 		,0
 		,FInfomation.MaxBullet);
 
