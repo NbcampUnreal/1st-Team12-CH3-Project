@@ -190,7 +190,7 @@ void UMiniGameAvoid::StartGame()
 
     if (UWorld* World = GetWorld())
     {
-        World->GetTimerManager().SetTimer(GameTimerHandle, this, &UMiniGameAvoid::EndGame, 5.0f, false); //
+        World->GetTimerManager().SetTimer(GameTimerHandle, this, &UMiniGameAvoid::EndGame, 20.0f, false); //
         World->GetTimerManager().SetTimer(ObstacleSpawnHandle, this, &UMiniGameAvoid::SpawnObstacleAtRandomLocation, 0.5f, true);
     }
 }

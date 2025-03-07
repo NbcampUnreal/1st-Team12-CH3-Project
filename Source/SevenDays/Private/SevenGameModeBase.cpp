@@ -111,7 +111,7 @@ FVector ASevenGameModeBase::GetSpawnLocationForWave(int32 Wave)
     }
 
     // 1~6 웨이브: 현재 웨이브 수를 기준으로 번갈아 가면서 선택
-    if (Wave >= 1 && Wave <= 6)
+    if (Wave >= 1 && Wave <= 2)
     {
         int32 SpawnIndex = (Wave % 2 == 0) ? 0 : 1; // 짝수 웨이브: 1번 스폰 지역, 홀수 웨이브: 2번 스폰 지역
         SpawnManager->SetSpawnPoint(SpawnIndex);
@@ -120,7 +120,7 @@ FVector ASevenGameModeBase::GetSpawnLocationForWave(int32 Wave)
 
     }
     // 7 웨이브: 3번 스폰 지역 고정
-    else if (Wave == 7)
+    else if (Wave == 3)
     {
         SpawnManager->SetSpawnPoint(2);
         //SpawnManager->CreateBoss(SpawnManager->PlayerSpawnPointArray[2]->GetActorLocation());
@@ -217,7 +217,7 @@ void ASevenGameModeBase::StartWave()
     // 좀비 스폰 실행
     if (SpawnManager)
     {
-        if (CurrentWave == 7) {
+        if (CurrentWave == 3) {
             SpawnManager->CreateBoss(FVector(523.0f, -293.0f, 101.0f));
             return;
         }
@@ -246,7 +246,7 @@ void ASevenGameModeBase::EndWave()
     }
     else
     {
-        CurrentWave = 7;
+        CurrentWave++;
         if (CurrentWave > WaveLimit)
         {
             return;

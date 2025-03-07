@@ -13,7 +13,7 @@
 ANBC_Zombie_Boss_Character::ANBC_Zombie_Boss_Character()
 {
 	IsBoss = true;
-	ZombieStat = FNBC_ZombieStruct(1, 350, 25, 30);
+	ZombieStat = FNBC_ZombieStruct(100, 350, 25, 30);
 		
 
 	if (USkeletalMeshComponent* skel = GetMesh())
