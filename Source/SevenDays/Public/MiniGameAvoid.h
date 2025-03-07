@@ -35,6 +35,7 @@ protected:
     UFUNCTION()
     void EndGame();
 
+    UFUNCTION()
     void CallMiniGameComplete();
 
     void ExitMiniGame();
