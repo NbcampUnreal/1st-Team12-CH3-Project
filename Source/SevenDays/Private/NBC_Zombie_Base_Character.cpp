@@ -24,7 +24,7 @@ ANBC_Zombie_Base_Character::ANBC_Zombie_Base_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ZombieStat = FNBC_ZombieStruct(100, 300, 1,0);
+	ZombieStat = FNBC_ZombieStruct(100, 300, 10,0);
 
 	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{

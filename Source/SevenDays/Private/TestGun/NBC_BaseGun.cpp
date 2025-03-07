@@ -13,13 +13,13 @@ UNBC_BaseGun::UNBC_BaseGun()
 	//총기 관련 셋팅
 	FPistol.SetReloadDelay(1.0f)
 		.SetShotDelay(0.2f)
-		.SetDamage(50)
+		.SetDamage(20)
 		.SetMaxRecoil(2.0f, 5.0f)
 		.SetBulletInfo(6, 30);
 
 	FRifle.SetReloadDelay(2.0f)
 		.SetShotDelay(0.1f)
-		.SetDamage(100)
+		.SetDamage(25)
 		.SetMaxRecoil(1.5f, 4.0f)
 		.SetBulletInfo(30, 150);
 
